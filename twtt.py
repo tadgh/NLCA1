@@ -219,7 +219,7 @@ def analyze_files(input_file, output_file):
     :return: None
     """
 
-    in_file = open(input_file, "r")
+    in_file = open(input_file, "r" )
     out_file = OutfileHandler(output_file)
     #Generating the Parser which we will use to strip all HTML tags.
     parser = TweetHTMLParser()

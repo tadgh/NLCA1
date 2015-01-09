@@ -170,6 +170,7 @@ class EllipsesFeature(Feature):
 
     def __init__(self):
         super(EllipsesFeature, self).__init__("Ellipses")
+        
 
     def get_score(self, string):
         count = 0
@@ -183,41 +184,75 @@ class CommonNounsFeature(Feature):
 
     def __init__(self):
         super(CommonNounsFeature, self).__init__("Common Nouns")
-
+        self._membership_set = ["NN", "NNS"]
+    
     def get_score(self, string):
-        pass
+        count = 0
+        for token in string:
+            if token.split('/')[1] in self._membership_set:
+                count += 1
+        return count
+
+
 
 class ProperNounsFeature(Feature):
 
     def __init__(self):
         super(ProperNounsFeature, self).__init__("Proper Nouns")
+        self._membership_set = ["NNP", "NNPS"]
 
     def get_score(self, string):
-        pass
+        count = 0
+        for token in string:
+            if token.split('/')[1] in self._membership_set:
+                count += 1
+        return count
+
 
 
 class AdverbsFeature(Feature):
+    
     def __init__(self):
         super(AdverbsFeature, self).__init__("Adverbs")
-
+        self._membership_set = ["RB", "RBR", "RBS"]
+    
     def get_score(self, string):
-        pass
+        count = 0
+        for token in string:
+            if token.split('/')[1] in self._membership_set:
+                count += 1
+        return count
+
+
+
 
 class WHWordsFeature(Feature):
 
     def __init__(self):
         super(WHWordsFeature, self).__init__("'wh-words")
+        self._membership_set = ["WDT", "WP", "WP$", "WRB"]
 
     def get_score(self, string):
-        pass
+        count = 0
+        for token in string:
+            if token.split('/')[1] in self._membership_set:
+                count += 1
+        return count
+
+
 
 class ModernSlangFeature(Feature):
 
     def __init__(self):
-        super(ModernSlangFeature, self).__init__("
-
+        super(ModernSlangFeature, self).__init__("Modern Slang")
+        self._membership_set = ["smh", "fwb", "lmfao", "lmao", "lms", "tbh", "rofl", "wtf", "bff", "wyd", "lylc", "brb", "atm", "imao", "sml", "btw", "bw", "imho", "fyi", "ppl", "sob", "ttyl", "imo", "ltr", "thx", "kk", "omg", "ttys", "afn", "bbs", "cya", "ez", "f2f", "gtr", "ic", "jk", "k", "ly", "ya", "nm", "np", "plz", "ru", "so", "tc", "tmi", "ym", "ur", "u", "sol"]
+    
     def get_score(self, string):
-        pass
+        count = 0
+        for token in string:
+            if token.split('/')[0] in self._membership_set:
+                count += 1
+        return count
 
 
 class AllCapsFeature(Feature):
@@ -225,14 +260,18 @@ class AllCapsFeature(Feature):
         super(AllCapsFeature, self).__init
 
     def get_score(self, string):
-        pass
+        for token in string:
+            count = 0
+            if token.isupper():
+                count += 1
 
 class AverageTokenFeature(Feature):
     def get_score(self, string):
-        return super(AverageTokenFeature, self).get_score(string)
+        return len(string)
 
     def __init__(self, name):
         super(AverageTokenFeature, self).__init__(name)
+        
 
 
 def extract_classes_from_list(class_list):
