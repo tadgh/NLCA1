@@ -2,22 +2,44 @@ import argparse
 
 __author__ = 'tadgh'
 
+feature_list = []
+
 class UserClass(object):
-   """
-   Holds information concerning the name of the class, and the appropriate member .twt files 
-   that are needed to generate the arf. 
-   """
+    """
+    Holds information concerning the name of the class, and the appropriate member .twt files 
+    that are needed to generate the arf. 
+    """
     tweet_count = 0
-    
+        
     def __init__(self, name, file_list):
         self._name = name
         self._files = file_list
 
     def generate_arff_data(self):
-        pass
+        for infile in self._files:
+            with open(infile, 'r') as file:
+                line = file.readline()
+                if line == "|\n":
+                    while line != "":
+                        tweet_lines = []
+                        line = file.readline()
+                        while line != "|\n":
+                            tweet_lines.append(line)
+                            line = file.readline()
+                        self.analyze_tweet(tweet_lines)            
 
     def __str__(self):
         return self._name + " -- " + str(self._files)
+
+    def analyze_tweet(self, tweet_lines):
+        feature_scores = []
+        for feature in feature_list:
+            feature_scores.append(0)
+            for line in tweet_lines:
+                feature_scores[-1] += feature.get_score(line)
+        print feature_scores
+
+
 
 class Feature(object):
     def __init__(self, name):
@@ -28,14 +50,14 @@ class Feature(object):
 
 class FirstPersonFeature(Feature):
 
-    def ___init__(self):
+    def __init__(self):
         super(FirstPersonFeature, self).__init__("First Person")
         self._membership_set = ['i', 'me', 'my', 'mine', 'we', 'us', 'our', 'ours']
 
     def get_score(self, string):
 
         count = 0
-        for token in string:
+        for token in string.split():
             if token.split('/')[0].lower() in self._membership_set:
                 count += 1
         return count
@@ -51,7 +73,7 @@ class SecondPersonFeature(Feature):
     def get_score(self, string):
 
         count = 0
-        for token in string:
+        for token in string.split():
             if token.split('/')[0].lower() in self._membership_set:
                 count += 1
         return count
@@ -67,7 +89,7 @@ class ThirdPersonFeature(Feature):
     def get_score(self, string):
 
         count = 0
-        for token in string:
+        for token in string.split():
             if token.split('/')[0].lower() in self._membership_set:
                 count += 1
         return count
@@ -81,7 +103,8 @@ class CoordinatingConjunctionsFeature(Feature):
 
     def get_score(self, string):
         count = 0
-        for token in string:
+        for token in string.split():
+            print "token is", token
             if token.split('/')[1] in self._membership_set:
                 count += 1
         return count
@@ -95,7 +118,7 @@ class PastTenseFeature(Feature):
 
     def get_score(self, string):
         count = 0
-        for token in string:
+        for token in string.split():
             if token.split('/')[1] in self._membership_set:
                 count += 1
         return count
@@ -108,12 +131,13 @@ class FutureTenseFeature(Feature):
 
     def get_score(self, string):
         count = 0
-        for i in xrange(string):
-            if string[i].split('/')[0].lower() in self._membership_set:
+        split_string = string.split()
+        for i in xrange(len(split_string)):
+            if split_string[i].split('/')[0].lower() in self._membership_set:
                 count += 1
-            elif string[i].split("/")[0] == "going":
-                if string[i + 1].split("/")[0] == "to":
-                    if string[i + 2].split("/")[1] == "VB":
+            elif split_string[i].split("/")[0] == "going":
+                if split_string[i + 1].split("/")[0] == "to":
+                    if split_string[i + 2].split("/")[1] == "VB":
                         count += 1
         return count
 
@@ -125,7 +149,7 @@ class CommaFeature(Feature):
 
     def get_score(self, string):
         count = 0
-        for token in string:
+        for token in string.split():
             if token.split('/')[0] in self._membership_set:
                 count += 1
         return count
@@ -137,7 +161,7 @@ class ColonFeature(Feature):
         self._membership_set = [":", ";"]
     def get_score(self, string):
         count = 0
-        for token in string:
+        for token in string.split():
             if token.split('/')[0] in self._membership_set:
                 count += 1
         return count
@@ -149,7 +173,7 @@ class DashFeature(Feature):
         self._membership_set = ["-"]
     def get_score(self, string):
         count = 0
-        for token in string:
+        for token in string.split():
             if token.split('/')[0] in self._membership_set:
                 count += 1
         return count
@@ -161,7 +185,7 @@ class ParenFeature(Feature):
         self._membership_set = ["(", ")"]
     def get_score(self, string):
         count = 0
-        for token in string:
+        for token in string.split():
             if token.split('/')[0] in self._membership_set:
                 count += 1
         return count
@@ -174,7 +198,7 @@ class EllipsesFeature(Feature):
 
     def get_score(self, string):
         count = 0
-        for token in string:
+        for token in string.split():
             if len(token) > 1 and all([letter == "." for letter in token]):
                 count += 1
         return count
@@ -188,7 +212,7 @@ class CommonNounsFeature(Feature):
     
     def get_score(self, string):
         count = 0
-        for token in string:
+        for token in string.split():
             if token.split('/')[1] in self._membership_set:
                 count += 1
         return count
@@ -203,7 +227,7 @@ class ProperNounsFeature(Feature):
 
     def get_score(self, string):
         count = 0
-        for token in string:
+        for token in string.split():
             if token.split('/')[1] in self._membership_set:
                 count += 1
         return count
@@ -218,7 +242,7 @@ class AdverbsFeature(Feature):
     
     def get_score(self, string):
         count = 0
-        for token in string:
+        for token in string.split():
             if token.split('/')[1] in self._membership_set:
                 count += 1
         return count
@@ -234,7 +258,7 @@ class WHWordsFeature(Feature):
 
     def get_score(self, string):
         count = 0
-        for token in string:
+        for token in string.split():
             if token.split('/')[1] in self._membership_set:
                 count += 1
         return count
@@ -249,7 +273,7 @@ class ModernSlangFeature(Feature):
     
     def get_score(self, string):
         count = 0
-        for token in string:
+        for token in string.split():
             if token.split('/')[0] in self._membership_set:
                 count += 1
         return count
@@ -257,14 +281,14 @@ class ModernSlangFeature(Feature):
 
 class AllCapsFeature(Feature):
     def __init__(self):
-        super(AllCapsFeature, self).__init
+        super(AllCapsFeature, self).__init__("All Caps")
 
     def get_score(self, string):
-        for token in string:
-            count = 0
+        count = 0
+        for token in string.split():
             if token.isupper():
                 count += 1
-
+        return count
 class AverageTokenFeature(Feature):
     def get_score(self, string):
         return len(string)
@@ -295,7 +319,10 @@ def extract_classes_from_list(class_list):
     for user in classes:
         print(user)
 
+    return classes
+
 def build_count_feature_set():
+    global feature_list
     f1 = FirstPersonFeature()
     f2 = SecondPersonFeature()
     f3 = ThirdPersonFeature()
@@ -313,6 +340,8 @@ def build_count_feature_set():
     f15 = WHWordsFeature()
     f16 = ModernSlangFeature()
     f17 = AllCapsFeature()
+    feature_list = [f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17]
+
 
 def main():
     parser = argparse.ArgumentParser(description="Build ARRF files from tokenized and tagged tweets")
@@ -320,7 +349,9 @@ def main():
     parser.add_argument("class_names", metavar="ClassNames", type=str, nargs='+')
     parser.add_argument("output_file", metavar="OutputFile", type=str, nargs=1)
     args = parser.parse_args()
-    extract_classes_from_list(args.class_names)
-    
+    user_classes = extract_classes_from_list(args.class_names)
+    build_count_feature_set() 
+    for user_class in user_classes:
+        user_class.generate_arff_data()
 if __name__=="__main__":
     main()
