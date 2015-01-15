@@ -34,7 +34,7 @@ def preprocess_tweet(tweet, parser, abbreviations, url_regex, tagger):
     tokens = []
     if tweet is not None:
         tweet = remove_html_tags(tweet, parser)
-        #tweet = remove_urls(tweet, url_regex)
+        tweet = remove_urls(tweet, url_regex)
         tweet = new_url_removal(tweet)
         sentences = split_into_sentences(tweet, abbreviations)
         token_lists = split_all_sentences_into_tokens(sentences)
@@ -233,7 +233,10 @@ def analyze_files(input_file, output_file):
 
     #TODO potentially remove my regex.
     ###Prepare the URL regex
-    url_regex = re.compile(r'(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?', re.IGNORECASE)
+    url_regex2 = re.compile(r'(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?', re.IGNORECASE)
+    url_regex3 = re.compile(r'((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\.\!\/\\\w]*))?)', re.IGNORECASE)
+
+    url_regex = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
 
     for tweet in in_file:
         tweet_sentences_processed = preprocess_tweet(tweet, parser, abbreviations, url_regex, tagger)

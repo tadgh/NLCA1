@@ -15,18 +15,57 @@ class UserClass(object):
         self._name = name
         self._files = file_list
 
-    def generate_arff_data(self):
+    def generate_arff_data2(self):
         for infile in self._files:
+            print "opening new file!"
             with open(infile, 'r') as file:
+                print "opened file!", infile
                 line = file.readline()
                 if line == "|\n":
                     while line != "":
+                        print "got line!", line, ":"
                         tweet_lines = []
+                        if line == "|\n":
+                            line = file.readline()
+                        while line != "|\n" and line != "|"and line != "":
+                            print "another line in the tweet!", line
+                            tweet_lines.append(line)
+                            print tweet_lines
+
+                            line = file.readline()
+                        self.analyze_tweet(tweet_lines)    
+
+
+    def generate_arff_data3(self):
+        for infile in self._files:
+            with open(infile, 'r') as file:
+                print "opening new file..."
+                line = file.readline()
+                if line == "|\n":
+                    while line != "":
+                        print "NEW TWEET LINE IS", line
                         line = file.readline()
-                        while line != "|\n":
+                        tweet_lines = []
+                        while line!="|\n" and line != "|":
+                            print "line is", line
                             tweet_lines.append(line)
                             line = file.readline()
-                        self.analyze_tweet(tweet_lines)            
+                        self.analyze_tweet(tweet_lines)
+                            
+    def generate_arff_data(self):
+        for infile in self._files:
+            with open(infile, "r") as file:
+                print "opening new file"
+                tweet_lines = []
+                for line in file:
+                    if line == "|\n":
+                        if len(tweet_lines) > 0:
+                            self.analyze_tweet(tweet_lines)
+                        tweet_lines = []
+                    else:
+                        tweet_lines.append(line)
+                        
+
 
     def __str__(self):
         return self._name + " -- " + str(self._files)
@@ -114,7 +153,7 @@ class PastTenseFeature(Feature):
 
     def __init__(self):
         super(PastTenseFeature, self).__init__("Past Tense")
-        self._membership_set = ['VBD']
+        self._membership_set = ['VBD', 'VBN']
 
     def get_score(self, string):
         count = 0
@@ -122,6 +161,12 @@ class PastTenseFeature(Feature):
             if token.split('/')[1] in self._membership_set:
                 count += 1
         return count
+
+def token_content(token):
+    return token.split('/')[0]
+
+def token_type(token):
+    return token.split('/')[1]
 
 class FutureTenseFeature(Feature):
 
@@ -352,6 +397,7 @@ def main():
     user_classes = extract_classes_from_list(args.class_names)
     build_count_feature_set() 
     for user_class in user_classes:
+        print "Generating new Arff data!"
         user_class.generate_arff_data()
 if __name__=="__main__":
     main()
