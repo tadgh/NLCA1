@@ -55,27 +55,23 @@ class UserClass(object):
         return feature_scores
 
 class OutfileHandler(object):
-    prologue_string = "@RELATION "
-    attribute_prefix_string = "@ATTRIBUTE "
-    data_tag = "@DATA"
-    feature_data_type = "NUMERIC"
 
     def __init__(self, outfile_name):
         self._file = open(outfile_name, "w")
             
-        self._prologue_string = "@RELATION "
-        self._attribute_prefix_string = "@ATTRIBUTE "
-        self._data_tag = "@DATA"
-        self._feature_data_type = "NUMERIC"
+        self._prologue_string = "@relation "
+        self._attribute_prefix_string = "@attribute "
+        self._data_tag = "@data"
+        self._feature_data_type = "numeric"
 
     def write_file_prologue(self, feature_list, class_list):
         """
         Prepares the ARFF file, writing any necessary prologue data. 
         """
-        self._file.write(self._prologue_string + "tweet_info" + "\n\n")
+        self._file.write(self._prologue_string + "tweeters" + "\n\n")
         for feature in feature_list:
             self._file.write(self._attribute_prefix_string + feature.get_name() + "\t" + self._feature_data_type + "\n")
-        self._file.write(self.attribute_prefix_string + "class" + "\t" + "{" + ','.join([u_class.get_name() for u_class in class_list]) + "}\n")
+        self._file.write(self._attribute_prefix_string + "class" + "\t" + "{" + ','.join([u_class.get_name() for u_class in class_list]) + "}\n")
 
         self._file.write("\n" + self._data_tag + "\n")
                 
@@ -150,9 +146,9 @@ def main():
     user_classes = extract_classes_from_list(args.class_names)
     build_count_feature_set()
     out = OutfileHandler(args.output_file[0])
+    out.write_file_prologue(feature_list, user_classes)
     for user_class in user_classes:
         print "Generating new Arff data!"
-        out.write_file_prologue(feature_list, user_classes)
         for score_vector in user_class.generate_arff_data():
            out.write_vector(score_vector) 
 

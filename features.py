@@ -244,7 +244,7 @@ class AdverbsFeature(Feature):
 class WHWordsFeature(Feature):
 
     def __init__(self):
-        super(WHWordsFeature, self).__init__("'wh-words")
+        super(WHWordsFeature, self).__init__("wh-words")
         self._membership_set = ["WDT", "WP", "WP$", "WRB"]
 
     def get_line_score(self, string):
