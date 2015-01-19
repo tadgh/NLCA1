@@ -1,6 +1,6 @@
 import argparse
 import string
-__author__ = 'tadgh'
+import features
 
 feature_list = []
 
@@ -20,7 +20,9 @@ class UserClass(object):
 
     def generate_arff_data(self):
         """
-        This is a generator that yields one vector at a time. 
+        This is a score generator that yields one vector at a time. For each tweet in each file
+        in self._files it will spit out a vector of length n+1, where n is the length of the feature
+        list, and the +1 is 
 
         """
         for infile in self._files:
@@ -43,6 +45,9 @@ class UserClass(object):
         return self._name + " -- " + str(self._files)
         
     def analyze_tweet(self, tweet_lines):
+        """
+        Given a list of lines tweet_lines, calculate a per-feature score, return a score vector for one tweet. 
+        """
         feature_scores = []
         for feature in feature_list:
             feature_scores.append(feature.get_score(tweet_lines))
@@ -64,6 +69,9 @@ class OutfileHandler(object):
         self._feature_data_type = "NUMERIC"
 
     def write_file_prologue(self, feature_list, class_list):
+        """
+        Prepares the ARFF file, writing any necessary prologue data. 
+        """
         self._file.write(self._prologue_string + "tweet_info" + "\n\n")
         for feature in feature_list:
             self._file.write(self._attribute_prefix_string + feature.get_name() + "\t" + self._feature_data_type + "\n")
@@ -72,319 +80,10 @@ class OutfileHandler(object):
         self._file.write("\n" + self._data_tag + "\n")
                 
     def write_vector(self, score_vector):
-        #for i in xrange(len(score_vector)):
+        """
+        Given a list of scores, writes them to the file in proper format. 
+        """
         self._file.write(", ".join(str(score) for score in score_vector) + "\n")
-            #self._file.write(str(score_vector[i]))
-            #self._file.write("\n" if i + 1 == len(score_vector) else " ,")
-
-
-class Feature(object):
-    def __init__(self, name):
-        self._name = name
-
-    def get_score(self, tweet):
-        """
-        Retrieves the score for the entire tweet. Override if you need to do something other than summation.
-        """
-        score = sum([self.get_line_score(line) for line in tweet])
-        return score
-
-    def get_line_score(self, string):
-        raise NotImplementedError("You need to implement this in a subclass!")
-
-    def get_name(self):
-        return self._name
-
-
-class FirstPersonFeature(Feature):
-
-    def __init__(self):
-        super(FirstPersonFeature, self).__init__("firstperson")
-        self._membership_set = ['i', 'me', 'my', 'mine', 'we', 'us', 'our', 'ours']
-
-    def get_line_score(self, string):
-
-        count = 0
-        for token in string.split():
-            if token.split('/')[0].lower() in self._membership_set:
-                count += 1
-        return count
-
-
-
-class SecondPersonFeature(Feature):
-
-    def __init__(self):
-        super(SecondPersonFeature, self).__init__("secondperson")
-        self._membership_set = ['you', 'your', 'yours', 'u', 'ur', 'urs']
-
-    def get_line_score(self, string):
-
-        count = 0
-        for token in string.split():
-            if token.split('/')[0].lower() in self._membership_set:
-                count += 1
-        return count
-
-
-
-class ThirdPersonFeature(Feature):
-
-    def __init__(self):
-        super(ThirdPersonFeature, self).__init__("Third Person")
-        self._membership_set = ['he', 'him', 'his', 'she', 'her', 'hers', 'it', 'its', 'they', 'them', 'their', 'theirs']
-
-    def get_line_score(self, string):
-
-        count = 0
-        for token in string.split():
-            if token.split('/')[0].lower() in self._membership_set:
-                count += 1
-        return count
-
-
-class CoordinatingConjunctionsFeature(Feature):
-
-    def __init__(self):
-        super(CoordinatingConjunctionsFeature, self).__init__("conjunctions")
-        self._membership_set = ['CC']
-
-    def get_line_score(self, string):
-        count = 0
-        for token in string.split():
-            if token.split('/')[1] in self._membership_set:
-                count += 1
-        return count
-
-
-class PastTenseFeature(Feature):
-
-    def __init__(self):
-        super(PastTenseFeature, self).__init__("pasttense")
-        self._membership_set = ['VBD', 'VBN']
-
-    def get_line_score(self, string):
-        count = 0
-        for token in string.split():
-            if token.split('/')[1] in self._membership_set:
-                count += 1
-        return count
-
-def token_content(token):
-    return token.split('/')[0]
-
-def token_type(token):
-    return token.split('/')[1]
-
-class FutureTenseFeature(Feature):
-
-    def __init__(self):
-        super(FutureTenseFeature, self).__init__("futuretense")
-        self._membership_set = ["'ll", "will", "gonna"]
-
-    def get_line_score(self, string):
-        count = 0
-        split_string = string.split()
-        for i in xrange(len(split_string)):
-            if split_string[i].split('/')[0].lower() in self._membership_set:
-                count += 1
-            elif split_string[i].split("/")[0].lower() == "going" and i + 2 < len(split_string):
-                if split_string[i + 1].split("/")[0].lower() == "to":
-                    if split_string[i + 2].split("/")[1] == "VB":
-                        count += 1
-        return count
-
-class CommaFeature(Feature):
-
-    def __init__(self):
-        super(CommaFeature, self).__init__("commas")
-        self._membership_set = [',']
-
-    def get_line_score(self, string):
-        count = 0
-        for token in string.split():
-            if token.split('/')[0] in self._membership_set:
-                count += 1
-        return count
-
-class ColonFeature(Feature):
-
-    def __init__(self):
-        super(ColonFeature, self).__init__("colonssemis")
-        self._membership_set = [":", ";"]
-    def get_line_score(self, string):
-        count = 0
-        for token in string.split():
-            if token.split('/')[0] in self._membership_set:
-                count += 1
-        return count
-
-class DashFeature(Feature):
-
-    def __init__(self):
-        super(DashFeature, self).__init__("dashes")
-        self._membership_set = ["-"]
-    def get_line_score(self, string):
-        count = 0
-        for token in string.split():
-            if token.split('/')[0] in self._membership_set:
-                count += 1
-        return count
-
-class ParenFeature(Feature):
-
-    def __init__(self):
-        super(ParenFeature, self).__init__("parentheses")
-        self._membership_set = ["(", ")"]
-    def get_line_score(self, string):
-        count = 0
-        for token in string.split():
-            if token.split('/')[0] in self._membership_set:
-                count += 1
-        return count
-
-class EllipsesFeature(Feature):
-
-    def __init__(self):
-        super(EllipsesFeature, self).__init__("ellipses")
-        
-
-    def get_line_score(self, string):
-        count = 0
-        for token in string.split():
-            if len(token) > 1 and all([letter == "." for letter in token]):
-                count += 1
-        return count
-
-
-class CommonNounsFeature(Feature):
-
-    def __init__(self):
-        super(CommonNounsFeature, self).__init__("commonnouns")
-        self._membership_set = ["NN", "NNS"]
-    
-    def get_line_score(self, string):
-        count = 0
-        for token in string.split():
-            if token.split('/')[1] in self._membership_set:
-                count += 1
-        return count
-
-
-
-class ProperNounsFeature(Feature):
-
-    def __init__(self):
-        super(ProperNounsFeature, self).__init__("propernouns")
-        self._membership_set = ["NNP", "NNPS"]
-
-    def get_line_score(self, string):
-        count = 0
-        for token in string.split():
-            if token.split('/')[1] in self._membership_set:
-                count += 1
-        return count
-
-
-
-class AdverbsFeature(Feature):
-    
-    def __init__(self):
-        super(AdverbsFeature, self).__init__("averbs")
-        self._membership_set = ["RB", "RBR", "RBS"]
-    
-    def get_line_score(self, string):
-        count = 0
-        for token in string.split():
-            if token.split('/')[1] in self._membership_set:
-                count += 1
-        return count
-
-
-
-
-class WHWordsFeature(Feature):
-
-    def __init__(self):
-        super(WHWordsFeature, self).__init__("'wh-words")
-        self._membership_set = ["WDT", "WP", "WP$", "WRB"]
-
-    def get_line_score(self, string):
-        count = 0
-        for token in string.split():
-            if token.split('/')[1] in self._membership_set:
-                count += 1
-        return count
-
-
-
-class ModernSlangFeature(Feature):
-
-    def __init__(self):
-        super(ModernSlangFeature, self).__init__("Modern Slang")
-        self._membership_set = ["smh", "fwb", "lmfao", "lmao", "lms", "tbh", "rofl", "wtf", "bff", "wyd", "lylc", "brb", "atm", "imao", "sml", "btw", "bw", "imho", "fyi", "ppl", "sob", "ttyl", "imo", "ltr", "thx", "kk", "omg", "ttys", "afn", "bbs", "cya", "ez", "f2f", "gtr", "ic", "jk", "k", "ly", "ya", "nm", "np", "plz", "ru", "so", "tc", "tmi", "ym", "ur", "u", "sol"]
-    
-    def get_line_score(self, string):
-        count = 0
-        for token in string.split():
-            if token.split('/')[0] in self._membership_set:
-                count += 1
-        return count
-
-
-class AllCapsFeature(Feature):
-    def __init__(self):
-        super(AllCapsFeature, self).__init__("all-caps")
-
-    def get_line_score(self, string):
-        count = 0
-        for token in string.split():
-            if token.isupper():
-                count += 1
-        return count
-
-class AverageSentenceLengthFeature(Feature):
-    def __init__(self):
-        super (AverageSentenceLengthFeature, self).__init__("avg-sent-len")
-
-    def get_score(self, tweet):
-        line_count = len(tweet)
-        token_count = 0
-        for line in tweet:
-            token_count += len(line.split())
-        avg_tokens = float(token_count) / line_count
-
-        return "{0:.3f}".format(avg_tokens)
-
-class AverageTokenLengthFeature(Feature):
-    def __init__(self):
-        super (AverageTokenLengthFeature, self).__init__("avg-token-len")
-        self._punctuation_set = tuple(string.punctuation)
-
-    def get_score(self, tweet):
-        token_count = 0
-        total_token_length = 0
-        for line in tweet:
-            split_line = line.split()
-            token_count += len(split_line)
-            untagged_tokens = [token.split("/")[0] for token in split_line if token.split("/")[0] not in self._punctuation_set]
-            #for punc in self._punctuation_set:
-            #    if punc in untagged_tokens:
-            #        untagged_tokens.remove(punc)
-            total_token_length += sum([len(token.split("/")[0]) for token in split_line ])
-        avg_token_length = float(total_token_length) / token_count
-        
-        
-        return "{0:.3f}".format(avg_token_length)
-
-
-            
-class SentenceCountFeature(Feature):
-    def __init__(self):
-        super(SentenceCountFeature, self).__init__("sentencecount")
-   
-    def get_score(self, tweet):
-        return len(tweet)
 
 
 
@@ -412,28 +111,33 @@ def extract_classes_from_list(class_list):
     return classes
 
 def build_count_feature_set():
+    """
+    Generates the list of all features to be extracted. To add a new feature, subclass the Feature
+    class, and implement get_line_score() to count the score for a single string. Also, override 
+    get_score() if you need to change how the line scores are combined. By default they are summed. 
+    """
     global feature_list
-    f1 = FirstPersonFeature()
-    f2 = SecondPersonFeature()
-    f3 = ThirdPersonFeature()
-    f4 = CoordinatingConjunctionsFeature()
-    f5 = PastTenseFeature()
-    f6 = FutureTenseFeature()
-    f7 = CommaFeature()
-    f8 = ColonFeature()
-    f9 = DashFeature()
-    f10 = ParenFeature()
-    f11 = EllipsesFeature()
-    f12 = CommonNounsFeature()
-    f13 = ProperNounsFeature()
-    f14 = AdverbsFeature()
-    f15 = WHWordsFeature()
-    f16 = ModernSlangFeature()
-    f17 = AllCapsFeature()
-    f18 = AverageSentenceLengthFeature()
-    f19 = AverageTokenLengthFeature()
-    f20 = SentenceCountFeature()
-
+    f1 = features.FirstPersonFeature()
+    f2 = features.SecondPersonFeature()
+    f3 = features.ThirdPersonFeature()
+    f4 = features.CoordinatingConjunctionsFeature()
+    f5 = features.PastTenseFeature()
+    f6 = features.FutureTenseFeature()
+    f7 = features.CommaFeature()
+    f8 = features.ColonFeature()
+    f9 = features.DashFeature()
+    f10 = features.ParenFeature()
+    f11 = features.EllipsesFeature()
+    f12 = features.CommonNounsFeature()
+    f13 = features.ProperNounsFeature()
+    f14 = features.AdverbsFeature()
+    f15 = features.WHWordsFeature()
+    f16 = features.ModernSlangFeature()
+    f17 = features.AllCapsFeature()
+    f18 = features.AverageSentenceLengthFeature()
+    f19 = features.AverageTokenLengthFeature()
+    f20 = features.SentenceCountFeature()
+    
     feature_list = [f1,f2,f3,f4,f5,f6,f7,f8,f9,f10,f11,f12,f13,f14,f15,f16,f17, f18, f19, f20]
 
 

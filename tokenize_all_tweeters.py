@@ -3,7 +3,7 @@ __author__ = 'tadgh'
 import os
 
 ROOT_DIR = "tweets/"
-OUTPUT_DIR = "output/"
+OUTPUT_DIR = ""
 if __name__ == "__main__":
     tweet_filenames = os.listdir(ROOT_DIR)
     for filename in tweet_filenames:
