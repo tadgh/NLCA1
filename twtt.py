@@ -136,6 +136,14 @@ def split_into_tokens(sentence):
         last_split = 0
         while i < len(word):
             if word[i] in punctuation_set:
+		#checking for posessive clitic
+		if i + 2 == len(word) and word[i] == "'" and word[i + 1] == "s":
+			print "Found posessive clitic!"
+                        tokens.append(word[last_split: i])
+		elif i + 1 == len(word) and word[i] == "'" and word[i - 1 ] == "s":
+			print "Found posessive clitic!"
+		   	tokens.append(word[last_split :i])
+
                 tokens.append(word[last_split: i])
                 last_split = i
                 j = 1
@@ -233,9 +241,11 @@ def analyze_files(input_file, output_file):
 
     #TODO potentially remove my regex.
     ###Prepare the URL regex
-    url_regex2 = re.compile(r'(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?', re.IGNORECASE)
-    url_regex3 = re.compile(r'((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\.\!\/\\\w]*))?)', re.IGNORECASE)
-
+    #url_regex2 = re.compile(r'(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?', re.IGNORECASE)
+    #url_regex3 = re.compile(r'((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\.\!\/\\\w]*))?)', re.IGNORECASE)
+    #TODO regex sourced from https://gist.github.com/uogbuji/705383
+    
+    
     url_regex = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
     count = 0
     for tweet in in_file:
