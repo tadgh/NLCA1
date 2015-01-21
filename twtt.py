@@ -35,7 +35,6 @@ def preprocess_tweet(tweet, parser, abbreviations, url_regex, tagger):
     if tweet is not None:
         tweet = remove_html_tags(tweet, parser)
         tweet = remove_urls(tweet, url_regex)
-        tweet = new_url_removal(tweet)
         sentences = split_into_sentences(tweet, abbreviations)
         token_lists = split_all_sentences_into_tokens(sentences)
         tagged_tokens = []
@@ -72,10 +71,6 @@ def remove_urls(tweet, url_regex):
 
     return tweet
 
-def new_url_removal(tweet):
-    parts = tweet.split()
-    return " ".join([word for word in parts if not word.lower().startswith(("http", "www"))])
-
 
 def split_into_sentences(tweet, abbreviations):
     """
@@ -89,13 +84,26 @@ def split_into_sentences(tweet, abbreviations):
     separated_tweet = tweet.split()
     sentences = []
     last_sentence_index = 0
-    for i in range(len(separated_tweet)):
+    #Iterate through the entire tweet separated on spaces.
+    for i in xrange(len(separated_tweet)):
+        #! and ? are definitely terminating punctuation
         if separated_tweet[i].endswith(("!", "?")):
-            sentences.append(separated_tweet[last_sentence_index: i+1])
+            sentences.append(separated_tweet[last_sentence_index : i+1])
             last_sentence_index = i+1
+
+        #otherwise a period at the end of a sentence is terminating if it isnt an abbreviation.
         elif separated_tweet[i].endswith(".") and separated_tweet[i].lower() not in abbreviations:
-            sentences.append(separated_tweet[last_sentence_index: i+1])
+            sentences.append(separated_tweet[last_sentence_index : i+1])
             last_sentence_index = i+1
+
+        #Now check for any periods. If there are multiples get the rightost.
+        #Is the character following that period a capital letter? 
+        elif "." in separated_tweet[i]:
+            period_index = separated_tweet[i].rfind(".")
+            if separated_tweet[i][period_index + 1].isupper():
+                sentences.append(separated_tweet[last_sentence_index : i+1])
+                last_sentence_index = i+1
+
     if last_sentence_index < len(separated_tweet):
         sentences.append(separated_tweet[last_sentence_index:])
 
