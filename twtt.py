@@ -1,4 +1,5 @@
 import string
+from constants import sentence_split_regex, url_regex, secondary_url_regex, token_split_regex
 
 __author__ = 'tadgh'
 import HTMLParser
@@ -8,13 +9,13 @@ import htmlentitydefs
 
 import tagger.NLPlib as nlp
 
-###
+# ##
 # Tweet Preprocessor. Strips all HTML tags, replaces HTML codes with ascii equivalents, removes all URLS, Removes
 # Hashtags and Mention symbols, renders each sentence in a tweet on its own line. Tweets are delimited by the Pipe |
 ###
 
 
-def preprocess_tweet(tweet, parser, abbreviations, url_regex, tagger):
+def preprocess_tweet(tweet, parser, abbreviations, tagger):
     """
     Takes a single tweet string, and returns a list of lists, each outer list is a sentence in the tweet. Each inner
     list is a list of the tokens in that tweet, with all unnecessary information stripped.
@@ -34,8 +35,7 @@ def preprocess_tweet(tweet, parser, abbreviations, url_regex, tagger):
     tokens = []
     if tweet is not None:
         tweet = remove_html_tags(tweet, parser)
-        tweet = remove_urls(tweet, url_regex)
-        tweet = new_url_removal(tweet)
+        tweet = remove_urls(tweet)
         sentences = split_into_sentences(tweet, abbreviations)
         token_lists = split_all_sentences_into_tokens(sentences)
         tagged_tokens = []
@@ -43,8 +43,9 @@ def preprocess_tweet(tweet, parser, abbreviations, url_regex, tagger):
             tags = tagger.tag(token_list)
             tag_tuples = zip(token_list, tags)
             tagged_tokens.append(["/".join(elem) for elem in tag_tuples])
-        #nifty return " ".join([tok for sublist in tokens for tok in sublist])
+            #nifty return " ".join([tok for sublist in tokens for tok in sublist])
     return tagged_tokens
+
 
 def remove_html_tags(tweet, parser):
     """
@@ -59,48 +60,51 @@ def remove_html_tags(tweet, parser):
     parser.feed(tweet)
     return parser.data
 
+
 #TODO remove this. It also removes things like "Hello.....whatever"
-def remove_urls(tweet, url_regex):
+def remove_urls(tweet):
     """
     Removes URLs from any string.
 
     :param tweet: A tweet with URLs(possibly) in it, a string.
-    :param url_regex: A regular expression attempting to capture all possible URLs.
     :return: The original tweet parameter with all URLs removed.
     """
     tweet = re.sub(url_regex, "", tweet)
-
+    tweet = re.sub(secondary_url_regex, "", tweet)
     return tweet
 
-def new_url_removal(tweet):
-    parts = tweet.split()
-    return " ".join([word for word in parts if not word.lower().startswith(("http", "www"))])
-
-
 def split_into_sentences(tweet, abbreviations):
-    """
-    Split a tweet into sentences using end-punctuation and a small set of heuristics.
 
-    :param tweet: A string representing a tweet.
-    :param abbreviations: A list of abbreviations that sentences should not split on.
-    :return: A list of list of strings, each of which represents a sentence.
-    """
+    #First we save our abbreviations so we don't wipe them out. This repalcement token is arbitrary, but it makes sure
+    #I don't have to try to rebuild strings after accidentally oversplitting on periods.
+    for abbr in abbreviations:
+        tweet = re.sub(" " + re.escape(abbr), " " +abbr.upper().rstrip(".") + "~|~|", tweet, flags=re.IGNORECASE)
 
-    separated_tweet = tweet.split()
-    sentences = []
-    last_sentence_index = 0
-    for i in range(len(separated_tweet)):
-        if separated_tweet[i].endswith(("!", "?")):
-            sentences.append(separated_tweet[last_sentence_index: i+1])
-            last_sentence_index = i+1
-        elif separated_tweet[i].endswith(".") and separated_tweet[i].lower() not in abbreviations:
-            sentences.append(separated_tweet[last_sentence_index: i+1])
-            last_sentence_index = i+1
-    if last_sentence_index < len(separated_tweet):
-        sentences.append(separated_tweet[last_sentence_index:])
+    #potential_sentences = re.split(r"(\.\.+\s?)(?=[A-Z])|([?!]+)|(\.\s)|(\.$)", tweet)
+    potential_sentences = sentence_split_regex.split(tweet)
+    #cleaning out unmatched groups
+    potential_sentences = [sentence.strip() for sentence in potential_sentences if sentence]
 
-    #print "sentences are: ", str(sentences)
-    return sentences
+    #recombining the sentence with its punctuation for ease of transport.
+    repunctuated_sentences = []
+    i = 0
+    while i < len(potential_sentences) - 1:
+        repunctuated_sentences.append(potential_sentences[i] + potential_sentences[i + 1])
+        i += 2
+
+    #Grabbing the final sentence if it wasn't terminated by punctuation.
+    if i < len(potential_sentences):
+        repunctuated_sentences.append(potential_sentences[-1])
+
+    #Re-adding abbreviation periods.
+    i = 0
+    while i < len(repunctuated_sentences):
+        repunctuated_sentences[i] = re.sub(r'~\|~\|', ".", repunctuated_sentences[i], flags=re.IGNORECASE)
+        i += 1
+
+    return [s for s in repunctuated_sentences if s]
+
+
 
 def split_all_sentences_into_tokens(sentences):
     """
@@ -117,49 +121,10 @@ def split_all_sentences_into_tokens(sentences):
     #print "all found tokens: ", all_tokens
     return all_tokens
 
+
 def split_into_tokens(sentence):
-    """
-    Take a sentence(list of words) and return a list of tokens determined by the assignment spec.
-        1)punctuation is its own token.
-        2)multiple sequential punctuation is a single token
-        3) clitics are weird. Not sure exactly what to do.
-        4)also, split end apostrophe.
-    :param sentence:
-    :return:
-    """
-
-    punctuation_set = tuple(string.punctuation)
-    tokens = []
-    # "sentence is", sentence
-    for word in sentence:
-        i = 0
-        last_split = 0
-        while i < len(word):
-            if word[i] in punctuation_set:
-		#checking for posessive clitic
-		if i + 2 == len(word) and word[i] == "'" and word[i + 1] == "s":
-			print "Found posessive clitic!"
-                        tokens.append(word[last_split: i])
-		elif i + 1 == len(word) and word[i] == "'" and word[i - 1 ] == "s":
-			print "Found posessive clitic!"
-		   	tokens.append(word[last_split :i])
-
-                tokens.append(word[last_split: i])
-                last_split = i
-                j = 1
-                while i + j < len(word) and word[i+j] == word[i]:
-                    j += 1
-                if i + j >= len(word):
-                    tokens.append(word[last_split:])
-                    last_split = len(word)
-                else:
-                    tokens.append(word[last_split: i + j])
-                    last_split = i+j
-                i += j
-            else:
-                i += 1
-        tokens.append(word[last_split:])
-    return [tok for tok in tokens if tok != '']
+    tokens = token_split_regex.split(sentence)
+    return [token for token in tokens if token.strip()]
 
 class OutfileHandler(object):
     def __init__(self, filename):
@@ -175,11 +140,13 @@ class OutfileHandler(object):
         self.outfile.write("|\n")
         self.outfile.close()
 
+
 class TweetHTMLParser(HTMLParser.HTMLParser):
     """
     Class to handle HTML parsing.
     Responsibility is to ignore anything that is a tag start or end, and keep only the actual data.
     """
+
     def __init__(self):
         HTMLParser.HTMLParser.__init__(self)
         self.data = ""
@@ -205,6 +172,7 @@ class TweetHTMLParser(HTMLParser.HTMLParser):
     def clear(self):
         self.data = ""
 
+
 def init_abbreviations():
     """
     None -> List of strings
@@ -215,7 +183,8 @@ def init_abbreviations():
     eng_abbrs = []
     with open("abbrev.english", "r") as abbr1:
         with open("pn_abbrev.english", "r") as abbr2:
-            eng_abbrs.append([line.lower().strip() for line in abbr1.readlines() + abbr2.readlines()])
+
+            eng_abbrs = [line.lower().strip() for line in abbr1.readlines()] + [line.lower().strip() for line in abbr2.readlines()]
     return eng_abbrs
 
 
@@ -227,7 +196,7 @@ def analyze_files(input_file, output_file):
     :return: None
     """
 
-    in_file = open(input_file, "r" )
+    in_file = open(input_file, "r")
     out_file = OutfileHandler(output_file)
     #Generating the Parser which we will use to strip all HTML tags.
     parser = TweetHTMLParser()
@@ -244,16 +213,16 @@ def analyze_files(input_file, output_file):
     #url_regex2 = re.compile(r'(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?', re.IGNORECASE)
     #url_regex3 = re.compile(r'((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\.\!\/\\\w]*))?)', re.IGNORECASE)
     #TODO regex sourced from https://gist.github.com/uogbuji/705383
-    
-    
-    url_regex = re.compile(ur'(?i)\b((?:https?://|www\d{0,3}[.]|[a-z0-9.\-]+[.][a-z]{2,4}/)(?:[^\s()<>]+|\(([^\s()<>]+|(\([^\s()<>]+\)))*\))+(?:\(([^\s()<>]+|(\([^\s()<>]+\)))*\)|[^\s`!()\[\]{};:\'".,<>?\xab\xbb\u201c\u201d\u2018\u2019]))')
+
+
     count = 0
     for tweet in in_file:
         count += 1
-        tweet_sentences_processed = preprocess_tweet(tweet, parser, abbreviations, url_regex, tagger)
+        tweet_sentences_processed = preprocess_tweet(tweet, parser, abbreviations, tagger)
         print count, " --- ", tweet_sentences_processed
         out_file.write_tweet(tweet_sentences_processed)
     out_file.close()
+
 
 def main():
     #Generic Argument arsing setup to handle CLI arguments.
@@ -267,5 +236,5 @@ def main():
     analyze_files(args.input_file, args.output_file)
 
 
-if __name__=="__main__":
+if __name__ == "__main__":
     main()
