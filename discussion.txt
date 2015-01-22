@@ -1,0 +1,39 @@
+3.1. Celebrity Potpourri:
+After having generated the arff file (celebpotpour.arff) I executed the following commands to gather information about the differences between the classifiers:
+
+java -cp weka.jar weka.classifiers.functions.SMO -t celebpotpour.arff -o
+java -cp weka.jar weka.classifiers.bayes.NaiveBayes -t celebpotpour.arff -o
+java -cp weka.jar weka.classifiers.trees.J48 -t celebpotpour.arff -o
+
+
+=== Stratified cross-validation ===
+
+Correctly Classified Instances        3064               51.2203 %
+Incorrectly Classified Instances      2918               48.7797 %
+Kappa statistic                          0.4147
+Mean absolute error                      0.2453
+Root mean squared error                  0.3451
+Relative absolute error                 88.292  %
+Root relative squared error             92.6131 %
+Total Number of Instances             5982
+
+
+=== Confusion Matrix ===
+
+   a   b   c   d   e   f   <-- classified as
+ 516 134 114  38 152  46 |   a = BarackObama
+  80 522 128  97 114  59 |   b = StephenAtHome
+ 102  97 549 120  65  53 |   c = aplusk
+  36 114 281 469  74  26 |   d = KimKardashian
+ 178 159  75  62 447  78 |   e = neiltyson
+  67  99 148  37  85 561 |   f = shakira
+
+The above is SMO data.
+
+Seeing as by default, feeding it only a single arff file will cause it to do 10-fold cross-validation, we do not have to add any other parameters to these commands. 
+
+To begin with, SMO, support vector machines, had accuracy of 51.22% during cross-validation. This roughly matched what it had for accuracy in the training data. 
+Next up, naive bayes. In this case, we achieved 43.33% accuracy during cross-validation. This is worse than the SMO so far. 
+Finally, we look at trees.J48, which achieved 43.81%, which is extremely similar to the result we achieve with naive bayes. 
+However, it seems to be the support vector machines that allow us to achieve the best possible result. 
+
