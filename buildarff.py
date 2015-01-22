@@ -22,7 +22,7 @@ class UserClass(object):
         """
         This is a score generator that yields one vector at a time. For each tweet in each file
         in self._files it will spit out a vector of length n+1, where n is the length of the feature
-        list, and the +1 is 
+        list, and the +1 is the class name itself. 
 
         """
         for infile in self._files:
