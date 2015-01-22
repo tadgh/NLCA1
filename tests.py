@@ -6,9 +6,15 @@ class TWTTTests(unittest.TestCase):
         self.abbrevs = twtt.init_abbreviations()
 
     def test_posessive_clitic_is_split(self):
-        tweet_sentence = "gary's is not peoples'"
+        tweet_sentence = "No major differences between' Tea can't won't we'll help don't Party agenda and GOP candidates' policies"
         result = twtt.split_into_tokens(tweet_sentence)
-        correct = ['gary', "'s", 'is', 'not', 'peoples', "'"]
+        correct =['No', 'major', 'differences',
+                  'between', "'", 'Tea', 'ca', "n't",
+                  'wo', "n't", 'we', "'ll", 'help',
+                  'do', "n't", 'Party', 'agenda',
+                  'and', 'GOP', 'candidates', "'",
+                  'policies']
+
         self.assertListEqual(result, correct)
 
     def test_splitting_into_sentences_unterminated(self):

@@ -219,8 +219,9 @@ def analyze_files(input_file, output_file):
     for tweet in in_file:
         count += 1
         tweet_sentences_processed = preprocess_tweet(tweet, parser, abbreviations, tagger)
-        print count, " --- ", tweet_sentences_processed
+        #print count, " --- ", tweet_sentences_processed
         out_file.write_tweet(tweet_sentences_processed)
+    print count, " --- ", in_file
     out_file.close()
 
 
