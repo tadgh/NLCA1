@@ -90,7 +90,6 @@ class CoordinatingConjunctionsFeature(Feature):
     def get_line_score(self, string):
         count = 0
         for token in string.split():
-            print token
             if token.split('/')[1] in self._membership_set:
                 count += 1
         return count
@@ -104,7 +103,6 @@ class PastTenseFeature(Feature):
 
     def get_line_score(self, string):
         count = 0
-        print string
         for token in string.split():
             if token.split('/')[1] in self._membership_set:
                 count += 1

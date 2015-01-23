@@ -1,5 +1,6 @@
 import unittest
 import twtt
+import features
 
 class TWTTTests(unittest.TestCase):
     def setUp(self):
@@ -56,3 +57,79 @@ class TWTTTests(unittest.TestCase):
         result = twtt.remove_urls(tweet).strip()
         answer = ''
         self.assertEqual(result, answer)
+
+        
+
+
+class FeatureTests(unittest.TestCase):
+    def setUp(self):
+        self.f1 = features.FirstPersonFeature()
+        self.f2 = features.SecondPersonFeature()
+        self.f3 = features.ThirdPersonFeature()
+        self.f4 = features.CoordinatingConjunctionsFeature()
+        self.f5 = features.PastTenseFeature()
+        self.f6 = features.FutureTenseFeature()
+        self.f7 = features.CommaFeature()
+        self.f8 = features.ColonFeature()
+        self.f9 = features.DashFeature()
+        self.f10 = features.ParenFeature()
+        self.f11 = features.EllipsesFeature()
+        self.f12 = features.CommonNounsFeature()
+        self.f13 = features.ProperNounsFeature()
+        self.f14 = features.AdverbsFeature()
+        self.f15 = features.WHWordsFeature()
+        self.f16 = features.ModernSlangFeature()
+        self.f17 = features.AllCapsFeature()
+        self.f18 = features.AverageSentenceLengthFeature()
+        self.f19 = features.AverageTokenLengthFeature()
+        self.f20 = features.SentenceCountFeature()
+
+    def test_first_person_features(self):
+        tweet = ["This is my first line, I like it a lot",
+                 "wow, our lucky day. Another line for our collection",
+                 "We enjoy OUR lines. Mine."]
+        result = self.f1.get_score(tweet)
+        answer = 6
+        self.assertEqual(result, answer)
+
+    def test_second_person_feature(self):   
+        tweet = ["This is your/NN first line, you like it a lot u do",
+                 "wow, your lucky day. Another line for yours/ collection",
+                 "urs enjoy ur lines. Mine."]
+        result = self.f2.get_score(tweet)
+        answer = 7
+        self.assertEqual(result, answer)
+
+    def test_third_person_feature(self):
+        tweet = ["His friend is her friend. Their friends are also his and hers/NN .",
+                 "its so tired it can't even stand.",
+                 "they want to stop but they wont let them/NN ."]
+        result = self.f3.get_score(tweet)
+        answer = 10
+        self.assertEqual(result, answer)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
