@@ -44,36 +44,38 @@ Using the SVM method which previously generated the best data, we now have this 
 >>>java -cp weka.jar weka.classifiers.functions.SMO -t pop.arff -o
 
 
-Correctly Classified Instances        2083               42.0383 %
-Incorrectly Classified Instances      2872               57.9617 %
+Correctly Classified Instances        2471               41.5853 %
+Incorrectly Classified Instances      3471               58.4147 %
+
 
 === Confusion Matrix ===
 
    a   b   c   d   e   f   <-- classified as
- 490   0  80  49 152 229 |   a = britneyspears
-   0   0   1   0   2   1 |   b = bieberpunc
- 149   0 230  86 323 211 |   c = katyperry
- 215   0 101 183 205 253 |   d = ladygaga
- 106   0 106  60 617 111 |   e = rihanna
- 158   0  53  82 139 563 |   f = taylorswift13
+ 712  77  12  29  61 109 |   a = britneyspears
+ 121 359  58  41 250 162 |   b = justinbieber
+  75 185 187  97 270 185 |   c = katyperry
+ 123 123  81 198 186 246 |   d = ladygaga
+  48 181  92  72 511  96 |   e = rihanna
+ 123 131  34 100 103 504 |   f = taylorswift13
+
 
 Compared to our results in the previous section, it appears as though the classifier is having more trouble distinguishing between these different tweeters. This is logical, as since they are all from the same superclass "pop stars", it makes sense that their writing styles are similar given the features we are extracting. When I decided to use the same training file to be the testing file, here are the results from WEKA.
 
 
 >>>java -cp weka.jar weka.classifiers.functions.SMO -t pop.arff -T pop.arff -o
 
-Correctly Classified Instances        2133               43.0474 %
-Incorrectly Classified Instances      2822               56.9526 %
+Correctly Classified Instances        2559               43.0663 %
+Incorrectly Classified Instances      3383               56.9337 %
 
 === Confusion Matrix ===
 
    a   b   c   d   e   f   <-- classified as
- 513   0  74  49 144 220 |   a = britneyspears
-   0   0   1   0   2   1 |   b = bieberpunc
- 144   0 242  82 324 207 |   c = katyperry
- 215   0  99 194 203 246 |   d = ladygaga
- 102   0 111  58 619 110 |   e = rihanna
- 162   0  52  79 137 565 |   f = taylorswift13	
+ 714  77  14  30  57 108 |   a = britneyspears
+ 122 380  57  38 236 158 |   b = justinbieber
+  75 175 192  99 268 190 |   c = katyperry
+ 124 124  74 215 177 243 |   d = ladygaga
+  48 178  83  67 530  94 |   e = rihanna
+ 123 119  33  89 103 528 |   f = taylorswift13
 
 Using the same file for testing against, we achieve better performance. I suppose this makes sense as we are using literally the exact same data that we built our model with, it makes sense that it would perform mildly better, since we can include parts of the training data. 
 
@@ -95,9 +97,15 @@ Incorrectly Classified Instances      3767               62.8672 %
 According to my results, it is in fact more difficult to distinguish different news agencies from one another compared to pop stars. This indicates to me that pop stars are a more distinguishable and unique group. 
 
 Here we compute the precision and recall for each individual class to determine which is the most identifiable.
-CBCNews: 		Precision = 0.33148 Recall = 0.63883
-cnn: 			Precision = 0.35918 Recall = 
-torontostarnews: 	Precision = 0.27549 Recall = 
-TheOnion: 		Precision = 0.48858 Recall = 
-Reuters: 		Precision = 0.35069 Recall = 
-nytimes: 		Precision = 0.43661  Recall = 
+CBCNews: 		    Precision = 0.33148 Recall = 0.63883
+cnn: 			    Precision = 0.35918 Recall = 0.26479
+torontostarnews: 	Precision = 0.27549 Recall = 0.20800
+TheOnion: 		    Precision = 0.48858 Recall = 0.42842
+Reuters: 		    Precision = 0.35069 Recall = 0.20260
+nytimes: 		    Precision = 0.43661 Recall = 0.46546
+
+Now we have to determine which of the news organizations is the most "distinct" from the others. In order to do this, I believe
+that a good measure of distinctness is this: It's own tweets are mostly classified correctly, with few other tweets being mistaken for it.
+Thus we must use some combination of recall and precision.
+
+3.4 Pop Versus News
