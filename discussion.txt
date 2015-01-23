@@ -106,6 +106,10 @@ nytimes: 		    Precision = 0.43661 Recall = 0.46546
 
 Now we have to determine which of the news organizations is the most "distinct" from the others. In order to do this, I believe
 that a good measure of distinctness is this: It's own tweets are mostly classified correctly, with few other tweets being mistaken for it.
-Thus we must use some combination of recall and precision.
+Thus we must use some combination of recall and precision. F
+
+For now, I will take an average of precision and recall and select the class producing the highest value.
+In this case, the higest value is  nytimes: .45103 CBC 485155 The Oneion :0.4585
+Least Distinct is toronto star at 0.24174
 
 3.4 Pop Versus News

@@ -117,7 +117,7 @@ def build_count_feature_set():
     f2 = features.SecondPersonFeature()
     f3 = features.ThirdPersonFeature()
     f4 = features.CoordinatingConjunctionsFeature()
-    f5 = features.PastTenseFeature()
+    f5 = features.PastTenseFeat     ure()
     f6 = features.FutureTenseFeature()
     f7 = features.CommaFeature()
     f8 = features.ColonFeature()

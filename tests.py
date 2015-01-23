@@ -108,23 +108,155 @@ class FeatureTests(unittest.TestCase):
         answer = 10
         self.assertEqual(result, answer)
 
+    
+    def test_conjunctions_feature(self):
+        tweet = ["here/ is/ my/ tweet/ and/CC I/ think/ it/ is/ ok/ ,/ but/CC .../C",
+                 "I/ think/ i/ could/ improve/ it/ with/CC" ,
+                 "more/ coordinating/ conjunctions/ and/CC things/ like/ that/"]
+        result = self.f4.get_score(tweet)
+        answer = 4
+        self.assertEqual(result, answer)
+
+    def test_pasttense_feature(self):
+        tweet = ["here/ is/ my/ tweet/VBN and/CC I/ think/ it/ is/ ok/ ,/ but/CC .../VBN",
+                 "I/ think/ i/VBD could/ improve/ it/ with/CC" ,
+                 "more/ coordinating/ conjunctions/ and/CC things/VBN like/VBR that/"]
+        result = self.f5.get_score(tweet)
+        answer = 4
+        self.assertEqual(result, answer)
+
+    def test_future_tense_feature(self):
+        tweet = ["here/ we/ 'll/whateva tweet/VBN ,/ and/CC I/ think/ it/ is/ ok/ ,/ but/CC .../VBN",
+                 "I/ think/ i/VBD going/ to/ imrpove/VB  ,,,/ with/CC",
+                 "more/ coordinating/ ,/ conjunctions/ will/CC help/VBN like/VBR that/"]
+        result = self.f6.get_score(tweet)
+        answer = 3
+        self.assertEqual(result, answer)
+
+    def test_comma_feature(self):
+        tweet = ["here/ is/ my/ tweet/VBN and/CC I/ think/ it/ is/ ok/ ,/ but/CC .../VBN",
+                 "I/ think/ i/VBD could/ improve/ it/ ,,,/ with/CC" ,
+                 "more/ coordinating/ ,/ ,/ conjunctions/ ,/ and/CC things/VBN like/VBR that/"]
+        result = self.f7.get_score(tweet)
+        answer = 4
+        self.assertEqual(result, answer)
+
+    def test_colon_feature(self):
+        tweet = ["here/ is/ my/ tweet/VBN and/CC :/: I/ think/ it/ is/ ok/ ,/ but/CC .../VBN",
+                 "I/ think/ i/VBD could/ ;/: improve/ it/ with/CC" ,
+                 "more/ :/: ;/: coordinating/ conjunctions/ and/CC things/VBN like/VBR that/"]
+        result = self.f8.get_score(tweet)
+        answer = 4
+        self.assertEqual(result, answer)
 
 
+    def test_dash_feature(self):
+        tweet = ["here/ is/ my/ -/- tweet/VBN and/CC I/ think/ it/ is/  -/- ok/ ,/ but/CC .../VBN",
+                 "I/ think/ i/VBD could/ improve/ it/ with/CC" ,
+                 "more/ coordinating/ -/- conjunctions/ and/CC things/VBN -/- like/VBR that/"]
+        result = self.f9.get_score(tweet)
+        answer = 4
+        self.assertEqual(result, answer)
+
+    def test_paren_feature(self):
+        tweet = ["here/ is/ my/ (/( tweet/VBN and/CC I/ think/ it/ )/(is/ ok/ ,/ but/CC .../VBN",
+                 "I/ think/ i/VBD could/ (/( improve/ it/ with/CC" ,
+                 "more/ coordinating/ conjunctions/ and/CC things/VBN (/) like/VBR that/"]
+        result = self.f10.get_score(tweet)
+        answer = 4
+        self.assertEqual(result, answer)
 
 
+    def test_ellipses_feature(self):
+        tweet = ["here/ is/ my/ ../ tweet/VBN .../ and/CC I/ think/ it/ is/ ok/ ,/ but/CC .../VBN",
+                 "I/ think/ i/VBD could/  ......../ improve/ it/ with/CC" ,
+                 "more/ coordinating/ ./. conjunctions/ ........../ and/CC things/VBN like/VBR that/"]
+        result = self.f11.get_score(tweet)
+        answer = 5
+        self.assertEqual(result, answer)
+
+    def test_common_nouns_feature(self):
+        tweet = ["here/NN is/ my/ tweet/VBN and/CC I/ think/ it/ is/ ok/ ,/ but/CC .../VBN",
+                 "I/ think/ i/VBD could/N improve/ it/ with/CC" ,
+                 "more/NN coordinating/ conjunctions/NNS and/CC things/NNS like/VBR that/"]
+        result = self.f12.get_score(tweet)
+        answer = 4
+        self.assertEqual(result, answer)
+
+    def test_proper_nouns_feature(self):
+        tweet = ["Gary/NNP is/ my/ tweet/VBN and/CC I/ think/ it/ is/ ok/ ,/ but/CC .../VBN",
+                 "I/ think/ i/VBD could/NNPS improve/ it/ with/CC" ,
+                 "more/ coordinating/ conjunctions/ and/NNP things/VBN like/VBR that/"]
+        result = self.f13.get_score(tweet)
+        answer = 3
+        self.assertEqual(result, answer)
+
+    def test_adverbs_feature(self):
+        tweet = ["here/ is/ my/ tweet/RBS and/CC I/ think/RBRS it/ is/ ok/ ,/ but/CC .../VBN",
+                 "I/ think/ i/VBD could/ improve/RB it/ with/CC" ,
+                 "more/ coordinating/ conjunctions/RBR and/CC things/VBN like/VBR that/"]
+        result = self.f14.get_score(tweet)
+        answer = 3
+        self.assertEqual(result, answer)
 
 
+    def test_wh_words_feature(self):
+        tweet = ["here/ is/ my/WP tweet/VBN and/CC I/ think/ it/ is/ ok/ ,/ but/CC .../VBN",
+                 "I/ think/ i/VBD co/WP$   uld/ improve/ it/ with/CC" ,
+                 "more/ coordinating/ conjunctions/ and/WDT things/VBN like/WRB that/"]
+        result = self.f15.get_score(tweet)
+        answer = 4
+        self.assertEqual(result, answer)
 
+    def test_modern_slang_feature(self):
+        tweet = ["smh/ at dis sob/ ./ lmao mah fwb is ez imo, so ur sol"]
+        result = self.f16.get_score(tweet)
+        answer = 8
+        self.assertEqual(result, answer)
 
+    def test_ALL_CAPS_feature(self):
+        tweet = ["HEY/ BRETT ,/ I/ WROTE/ YOU/ A/ SONG/"]
+        result = self.f17.get_score(tweet)
+        answer = 5
+        self.assertEqual(result, answer)
 
+    def test_average_sentence_length_feature(self):
+        tweet = ["Sellmecandy09/NN by/IN God/NNP 's/POS grace/NN ,/, we/PRP 'll/MD have/VBP both/DT"]
+        result = self.f18.get_score(tweet)
+        answer = 10
+        #floating the answer as i return it as a string.
+        self.assertEqual(float(result), answer)
 
+    #38 char
 
+    def test_average_sentence_length_with_multiple_sentencesfeature(self):
+        tweet = ["Sellmecandy09/NN by/IN God/NNP 's/POS grace/NN ,/, we/PRP 'll/MD have/VBP both/DT",
+                 "Sellmecandy09/NN by/IN God/NNP 's/POS grace/NN"]
+        result = self.f18.get_score(tweet)
+        answer = 7.5
+        #floating the answer as i return it as a string.
+        self.assertEqual(float(result), answer)
 
+    def test_average_token_length_feature(self):
+        tweet = ["Sellmecandy09/NN by/IN God/NNP 's/POS grace/NN ,/, we/PRP 'll/MD have/VBP both/DT"]
+        result = self.f19.get_score(tweet)
+        answer = 4.222
+        #floating the answer as i return it as a string.
+        self.assertEqual(float(result), answer)
 
+    def test_average_token_length_multiline_feature(self):
+        tweet = ["Sellmecandy09/NN by/IN God/NNP 's/POS grace/NN ,/, we/PRP 'll/MD have/VBP both/DT",
+                 "Sellmecandy09/NN by/IN God/NNP ,/, ,/,"]
+        result = self.f19.get_score(tweet)
+        answer = 4.667
+        #floating the answer as i return it as a string.
+        self.assertEqual(float(result), answer)
 
-
-
-
+    def test_sentence_count_feature(self):
+        tweet = ["1", "2", "3"]
+        result = self.f20.get_score(tweet)
+        answer = 3
+        self.assertEqual(result, answer)
 
 
 

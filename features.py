@@ -190,7 +190,8 @@ class EllipsesFeature(Feature):
     def get_line_score(self, string):
         count = 0
         for token in string.split():
-            if len(token) > 1 and all([letter == "." for letter in token]):
+            content = token.split("/")[0]
+            if len(content) > 1 and all([letter == "." for letter in content]):
                 count += 1
         return count
 
@@ -277,7 +278,8 @@ class AllCapsFeature(Feature):
     def get_line_score(self, string):
         count = 0
         for token in string.split():
-            if token.isupper():
+            content = token.split("/")[0]
+            if content.isupper() and len(content) > 1:
                 count += 1
         return count
 
@@ -304,16 +306,11 @@ class AverageTokenLengthFeature(Feature):
         total_token_length = 0
         for line in tweet:
             split_line = line.split()
-            token_count += len(split_line)
-            untagged_tokens = [token.split("/")[0] for token in split_line if token.split("/")[0] not in self._punctuation_set]
-            #TODO fix the damn avg len.
-            #for punc in self._punctuation_set:
-            #    if punc in untagged_tokens:
-            #        untagged_tokens.remove(punc)
-            total_token_length += sum([len(token.split("/")[0]) for token in split_line ])
+            non_punc_tokens = [token.split("/")[0] for token in split_line if token.split("/")[0] not in self._punctuation_set]
+            token_count += len(non_punc_tokens)
+            total_token_length += sum([len(token.split("/")[0]) for token in non_punc_tokens])
         avg_token_length = float(total_token_length) / token_count
-        
-        
+
         return "{0:.3f}".format(avg_token_length)
 
 

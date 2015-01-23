@@ -35,11 +35,8 @@ def preprocess_tweet(tweet, parser, abbreviations, tagger):
     tokens = []
     if tweet is not None:
         tweet = remove_html_tags(tweet, parser)
-<<<<<<< HEAD
-        tweet = remove_urls(tweet, url_regex)
-=======
+
         tweet = remove_urls(tweet)
->>>>>>> FETCH_HEAD
         sentences = split_into_sentences(tweet, abbreviations)
         token_lists = split_all_sentences_into_tokens(sentences)
         tagged_tokens = []
@@ -77,15 +74,12 @@ def remove_urls(tweet):
     tweet = re.sub(secondary_url_regex, "", tweet)
     return tweet
 
-<<<<<<< HEAD
-=======
 def split_into_sentences(tweet, abbreviations):
 
     #First we save our abbreviations so we don't wipe them out. This repalcement token is arbitrary, but it makes sure
     #I don't have to try to rebuild strings after accidentally oversplitting on periods.
     for abbr in abbreviations:
         tweet = re.sub(" " + re.escape(abbr), " " +abbr.upper().rstrip(".") + "~|~|", tweet, flags=re.IGNORECASE)
->>>>>>> FETCH_HEAD
 
     #potential_sentences = re.split(r"(\.\.+\s?)(?=[A-Z])|([?!]+)|(\.\s)|(\.$)", tweet)
     potential_sentences = sentence_split_regex.split(tweet)
@@ -111,38 +105,6 @@ def split_into_sentences(tweet, abbreviations):
 
     return [s for s in repunctuated_sentences if s]
 
-
-<<<<<<< HEAD
-    separated_tweet = tweet.split()
-    sentences = []
-    last_sentence_index = 0
-    #Iterate through the entire tweet separated on spaces.
-    for i in xrange(len(separated_tweet)):
-        #! and ? are definitely terminating punctuation
-        if separated_tweet[i].endswith(("!", "?")):
-            sentences.append(separated_tweet[last_sentence_index : i+1])
-            last_sentence_index = i+1
-
-        #otherwise a period at the end of a sentence is terminating if it isnt an abbreviation.
-        elif separated_tweet[i].endswith(".") and separated_tweet[i].lower() not in abbreviations:
-            sentences.append(separated_tweet[last_sentence_index : i+1])
-            last_sentence_index = i+1
-
-        #Now check for any periods. If there are multiples get the rightost.
-        #Is the character following that period a capital letter? 
-        elif "." in separated_tweet[i]:
-            period_index = separated_tweet[i].rfind(".")
-            if separated_tweet[i][period_index + 1].isupper():
-                sentences.append(separated_tweet[last_sentence_index : i+1])
-                last_sentence_index = i+1
-
-    if last_sentence_index < len(separated_tweet):
-        sentences.append(separated_tweet[last_sentence_index:])
-
-    #print "sentences are: ", str(sentences)
-    return sentences
-=======
->>>>>>> FETCH_HEAD
 
 def split_all_sentences_into_tokens(sentences):
     """
