@@ -1,0 +1,149 @@
+|
+__author__/NN =/SYM 'tadgh'/NN
+|
+|
+def/JJ old_split_into_tokens(sentence)/NN :/:
+|
+"""/NN
+|
+Take/VB a/DT sentence(list/NN of/IN words)/NN and/CC return/NN a/DT list/NN of/IN tokens/NNS determined/VBN by/IN the/DT assignment/NN spec/NN ./.
+|
+1)punctuation/NN is/VBZ its/PRP$ own/JJ token/JJ ./.
+|
+2)multiple/NN sequential/JJ punctuation/NN is/VBZ a/DT single/JJ token/JJ
+|
+3)/NN clitics/NNS are/VBP weird/JJ ./.
+Not/RB sure/JJ exactly/RB what/WP to/TO do/VBP ./.
+|
+4)also/NN ,/, split/NN end/NN apostrophe/NN ./.
+|
+:/: param/NN sentence/NN :/:
+|
+:/: return/NN :/:
+|
+"""/NN
+|
+punctuation_set/NN =/SYM tuple(string/VBG ./. punctuation)/NN
+|
+tokens/NNS =/SYM []/NN
+|
+"sentence/NN is"/NN ,/, sentencegary/NN
+|
+for/IN word/NN in/IN sentence/NN :/:
+|
+i/NN =/SYM 0/NN
+|
+last_split/NN =/SYM 0/NN
+|
+while/IN i/NN </SYM len(word)/NN :/:
+|
+if/IN word[i]/NN in/IN punctuation_set/NN :/:
+|
+checking/VBG for/IN posessive/NN clitic/NN
+|
+if/IN i/NN +/SYM 2/NN ==/NN len(word)/NN and/CC word[i]/NN ==/NN "/" '"/NN and/CC word[i/NN +/SYM 1]/NN ==/NN "s"/NN :/:
+|
+print/NN "Found/NN posessive/NN clitic/NN !/.
+"/"
+|
+tokens/NNS ./. append(word[last_split/NN :/: ])/NN
+|
+i/NN +=/NN 2/NN
+|
+last_split/NN +=/NN 2/NN
+|
+elif/NN i/NN +/SYM 1/NN ==/NN len(word)/NN and/CC word[i]/NN ==/NN "/" '"/NN and/CC word[i/NN -/: 1]/NN ==/NN "s"/NN :/:
+|
+print/NN "Found/NN posessive/NN clitic/NN !/.
+"/"
+|
+tokens/NNS ./. append(word[last_split/NN :/: ])/NN
+|
+i/NN +=/NN 1/NN
+|
+last_split/NN +=/NN 1/NN
+|
+else/RB :/:
+|
+tokens/NNS ./. append(word[last_split/NN :/: i])/NN
+|
+last_split/NN =/SYM i/NN
+|
+j/NN =/SYM 1/NN
+|
+while/IN i/NN +/SYM j/NN </SYM len(word)/NN and/CC word[i/NN +/SYM j]/NN ==/NN word[i]/NN :/:
+|
+j/NN +=/NN 1/NN
+|
+if/IN i/NN +/SYM j/NN >=/NN len(word)/NN :/:
+|
+tokens/NNS ./. append(word[last_split/NN :/: ])/NN
+|
+last_split/NN =/SYM len(word)/NN
+|
+else/RB :/:
+|
+tokens/NNS ./. append(word[last_split/NN :/: i/NN +/SYM j])/NN
+|
+last_split/NN =/SYM i/NN +/SYM j/NN
+|
+i/NN +=/NN j/NN
+|
+else/RB :/:
+|
+i/NN +=/NN 1/NN
+|
+tokens/NNS ./. append(word[last_split/NN :/: ])/NN
+|
+return/NN [tok/NN for/IN tok/NN in/IN tokens/NNS if/IN tok/NN !/.
+=/SYM '']/NN
+|
+|
+|
+|
+def/JJ split_into_sentences_old(tweet/NN ,/, abbreviations)/NN :/:
+|
+"""/NN
+|
+Split/VBN a/DT tweet/NN into/IN sentences/NNS using/VBG end-punctuation/NN and/CC a/DT small/JJ set/VBN of/IN heuristics/NNS ./.
+|
+|
+:/: param/NN tweet/NN :/: A/DT string/VBG representing/VBG a/DT tweet/NN ./.
+|
+:/: param/NN abbreviations/NNS :/: A/DT list/NN of/IN abbreviations/NNS that/IN sentences/NNS should/MD not/RB split/NN on/IN ./.
+|
+:/: return/NN :/: A/DT list/NN of/IN list/NN of/IN strings/NNS ,/, each/DT of/IN which/WDT represents/VBZ a/DT sentence/NN ./.
+|
+"""/NN
+|
+|
+separated_tweet/NN =/SYM tweet/NN ./. split()/NN
+|
+sentences/NNS =/SYM []/NN
+|
+last_sentence_index/NN =/SYM 0/NN
+|
+for/IN i/NN in/IN range(len(separated_tweet))/NN :/:
+|
+if/IN separated_tweet[i]/NN ./. endswith(("/NN !/.
+"/" ,/, "/" ?/.
+"))/NN :/:
+|
+sentences/NNS ./. append(separated_tweet[last_sentence_index/NN :/: i/NN +/SYM 1])/NN
+|
+last_sentence_index/NN =/SYM i/NN +/SYM 1/NN
+|
+elif/NN separated_tweet[i]/NN ./. endswith("/NN ./. ")/NN and/CC separated_tweet[i]/NN ./. lower()/NN not/RB in/IN abbreviations/NNS :/:
+|
+sentences/NNS ./. append(separated_tweet[last_sentence_index/NN :/: i/NN +/SYM 1])/NN
+|
+last_sentence_index/NN =/SYM i/NN +/SYM 1/NN
+|
+if/IN last_sentence_index/NN </SYM len(separated_tweet)/NN :/:
+|
+sentences/NNS ./. append(separated_tweet[last_sentence_index/NN :/: ])/NN
+|
+|
+return/NN [sentence/NN for/IN sentence/NN in/IN sentences/NNS if/IN sentence/NN !/.
+=/SYM '']/NN
+|
