@@ -1,0 +1,111 @@
+3.1. Celebrity Potpourri:
+After having generated the arff file (celebpotpour.arff) I executed the following commands to gather information about the differences between the classifiers:
+
+java -cp weka.jar weka.classifiers.functions.SMO -t celebpotpour.arff -o
+java -cp weka.jar weka.classifiers.bayes.NaiveBayes -t celebpotpour.arff -o
+java -cp weka.jar weka.classifiers.trees.J48 -t celebpotpour.arff -o
+
+
+=== Stratified cross-validation ===
+
+Correctly Classified Instances        3064               51.2203 %
+Incorrectly Classified Instances      2918               48.7797 %
+Kappa statistic                          0.4147
+Mean absolute error                      0.2453
+Root mean squared error                  0.3451
+Relative absolute error                 88.292  %
+Root relative squared error             92.6131 %
+Total Number of Instances             5982
+
+
+=== Confusion Matrix ===
+
+   a   b   c   d   e   f   <-- classified as
+ 516 134 114  38 152  46 |   a = BarackObama
+  80 522 128  97 114  59 |   b = StephenAtHome
+ 102  97 549 120  65  53 |   c = aplusk
+  36 114 281 469  74  26 |   d = KimKardashian
+ 178 159  75  62 447  78 |   e = neiltyson
+  67  99 148  37  85 561 |   f = shakira
+
+The above is SMO data.
+
+Seeing as by default, feeding it only a single arff file will cause it to do 10-fold cross-validation, we do not have to add any other parameters to these commands. 
+
+To begin with, SMO, support vector machines, had accuracy of 51.22% during cross-validation. This roughly matched what it had for accuracy in the training data. 
+Next up, naive bayes. In this case, we achieved 43.33% accuracy during cross-validation. This is worse than the SMO so far. 
+Finally, we look at trees.J48, which achieved 43.81%, which is extremely similar to the result we achieve with naive bayes. 
+However, it seems to be the support vector machines that allow us to achieve the best possible result. 
+
+3.2 Pop Stars.
+
+Using the SVM method which previously generated the best data, we now have this from WEKA:
+
+>>>java -cp weka.jar weka.classifiers.functions.SMO -t pop.arff -o
+
+
+Correctly Classified Instances        2471               41.5853 %
+Incorrectly Classified Instances      3471               58.4147 %
+
+
+=== Confusion Matrix ===
+
+   a   b   c   d   e   f   <-- classified as
+ 712  77  12  29  61 109 |   a = britneyspears
+ 121 359  58  41 250 162 |   b = justinbieber
+  75 185 187  97 270 185 |   c = katyperry
+ 123 123  81 198 186 246 |   d = ladygaga
+  48 181  92  72 511  96 |   e = rihanna
+ 123 131  34 100 103 504 |   f = taylorswift13
+
+
+Compared to our results in the previous section, it appears as though the classifier is having more trouble distinguishing between these different tweeters. This is logical, as since they are all from the same superclass "pop stars", it makes sense that their writing styles are similar given the features we are extracting. When I decided to use the same training file to be the testing file, here are the results from WEKA.
+
+
+>>>java -cp weka.jar weka.classifiers.functions.SMO -t pop.arff -T pop.arff -o
+
+Correctly Classified Instances        2559               43.0663 %
+Incorrectly Classified Instances      3383               56.9337 %
+
+=== Confusion Matrix ===
+
+   a   b   c   d   e   f   <-- classified as
+ 714  77  14  30  57 108 |   a = britneyspears
+ 122 380  57  38 236 158 |   b = justinbieber
+  75 175 192  99 268 190 |   c = katyperry
+ 124 124  74 215 177 243 |   d = ladygaga
+  48 178  83  67 530  94 |   e = rihanna
+ 123 119  33  89 103 528 |   f = taylorswift13
+
+Using the same file for testing against, we achieve better performance. I suppose this makes sense as we are using literally the exact same data that we built our model with, it makes sense that it would perform mildly better, since we can include parts of the training data. 
+
+3.3 News
+
+Correctly Classified Instances        2225               37.1328 %
+Incorrectly Classified Instances      3767               62.8672 %
+
+=== Confusion Matrix ===
+
+   a   b   c   d   e   f   <-- classified as
+ 658  62 110  38  51  81 |   a = CBCNews
+ 263 264 157 103 105 105 |   b = cnn
+ 430  97 208  85  67 113 |   c = torontostarnews
+ 126 123  72 428  74 176 |   d = TheOnion
+ 318 105 150  97 202 125 |   e = Reuters
+ 190  84  58 125  77 465 |   f = nytimes
+
+According to my results, it is in fact more difficult to distinguish different news agencies from one another compared to pop stars. This indicates to me that pop stars are a more distinguishable and unique group. 
+
+Here we compute the precision and recall for each individual class to determine which is the most identifiable.
+CBCNews: 		    Precision = 0.33148 Recall = 0.63883
+cnn: 			    Precision = 0.35918 Recall = 0.26479
+torontostarnews: 	Precision = 0.27549 Recall = 0.20800
+TheOnion: 		    Precision = 0.48858 Recall = 0.42842
+Reuters: 		    Precision = 0.35069 Recall = 0.20260
+nytimes: 		    Precision = 0.43661 Recall = 0.46546
+
+Now we have to determine which of the news organizations is the most "distinct" from the others. In order to do this, I believe
+that a good measure of distinctness is this: It's own tweets are mostly classified correctly, with few other tweets being mistaken for it.
+Thus we must use some combination of recall and precision.
+
+3.4 Pop Versus News
