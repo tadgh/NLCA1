@@ -76,7 +76,7 @@ def remove_urls(tweet):
 
 def split_into_sentences(tweet, abbreviations):
 
-    #First we save our abbreviations so we don't wipe them out. This repalcement token is arbitrary, but it makes sure
+    #First we save our abbreviations so we don't wipe them out. This replacement token is arbitrary, but it makes sure
     #I don't have to try to rebuild strings after accidentally oversplitting on periods.
     for abbr in abbreviations:
         tweet = re.sub(" " + re.escape(abbr), " " +abbr.upper().rstrip(".") + "~|~|", tweet, flags=re.IGNORECASE)
@@ -153,19 +153,16 @@ class TweetHTMLParser(HTMLParser.HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         pass
-        #print "Start Tag is:", tag
 
     def handle_endtag(self, tag):
         pass
-        #print "End Tag is:", tag
 
     def handle_data(self, data):
-        #print "Regular Data is:", data
+        #Sneakily removing @ and # symbols.
         self.data += " ".join([word[1:] if word.startswith(("@", "#")) else word for word in data.split()]) + " "
-        #print "String so far:", self.data
 
     def handle_entityref(self, name):
-        #print "entref is", name
+        #print "entref is", nam
         data = unichr(htmlentitydefs.name2codepoint[name])
         self.data += data + " "
 
