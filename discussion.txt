@@ -113,3 +113,9 @@ In this case, the higest value is  nytimes: .45103 CBC 485155 The Oneion :0.4585
 Least Distinct is toronto star at 0.24174
 
 3.4 Pop Versus News
+
+3.6 Bonus: 
+Here are the things I have done to improve the tokenizer and arffbuilder.
+- Seriously added to modern slang. Many additions
+- Fixed errors in tagging. Here are the ones I fixed:
+	- i is incorrectly tagged as NN when it should be PRP. 

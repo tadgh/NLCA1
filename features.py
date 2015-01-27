@@ -261,7 +261,12 @@ class ModernSlangFeature(Feature):
 
     def __init__(self):
         super(ModernSlangFeature, self).__init__("modernslang")
-        self._membership_set = ["smh", "fwb", "lmfao", "lmao", "lms", "tbh", "rofl", "wtf", "bff", "wyd", "lylc", "brb", "atm", "imao", "sml", "btw", "bw", "imho", "fyi", "ppl", "sob", "ttyl", "imo", "ltr", "thx", "kk", "omg", "ttys", "afn", "bbs", "cya", "ez", "f2f", "gtr", "ic", "jk", "k", "ly", "ya", "nm", "np", "plz", "ru", "so", "tc", "tmi", "ym", "ur", "u", "sol"]
+	#NOTE, i have appended to this list. 
+        self._membership_set = ["smh", "fwb", "lmfao", "lmao", "lms", "tbh", "rofl", "wtf", "bff", "wyd",
+			"lylc", "brb", "atm", "imao", "sml", "btw", "bw", "imho", "fyi", "ppl",
+			"sob", "ttyl", "imo", "ltr", "thx", "kk", "omg", "omfg", "bae","yolo",
+			"swag" "ttys", "afn", "bbs", "cya", "ez", "f2f", "gtr", "ic", "jk", "k",
+			"ly", "ya", "nm", "np", "plz", "ru", "so", "tc", "tmi", "ym", "ur", "u", "sol", "lms", "b4", "bc"]
     
     def get_line_score(self, string):
         count = 0
