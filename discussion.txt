@@ -146,3 +146,11 @@ and wh-words. If I had to choose a single overriding feature that proves to be m
 time that First Person breaks into the top five is in the Pop Versus News arff. The reason for this is obvious; News
 organizations never refer to themselves by "I" or any other such pronoun. Thus the presence of such a personal pronoun
 is a strong indicator that the tweet is pop-related. There are also other such features
+
+
+3.6 Bonus: 
+Here are the things I have done to improve the tokenizer and arffbuilder.
+- Seriously added to modern slang. Many additions
+- Fixed errors in tagging. Here are the ones I fixed:
+	- i is incorrectly tagged as NN when it should be PRP. 
+

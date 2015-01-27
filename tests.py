@@ -259,7 +259,8 @@ class FeatureTests(unittest.TestCase):
         self.assertEqual(result, answer)
 
 
-
+if __name__ == "__main__":
+    unittest.main()
 
 
 

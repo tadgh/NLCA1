@@ -76,7 +76,7 @@ def remove_urls(tweet):
 
 def split_into_sentences(tweet, abbreviations):
 
-    #First we save our abbreviations so we don't wipe them out. This repalcement token is arbitrary, but it makes sure
+    #First we save our abbreviations so we don't wipe them out. This replacement token is arbitrary, but it makes sure
     #I don't have to try to rebuild strings after accidentally oversplitting on periods.
     for abbr in abbreviations:
         tweet = re.sub(" " + re.escape(abbr), " " +abbr.upper().rstrip(".") + "~|~|", tweet, flags=re.IGNORECASE)
@@ -124,7 +124,11 @@ def split_all_sentences_into_tokens(sentences):
 
 def split_into_tokens(sentence):
     tokens = token_split_regex.split(sentence)
+    tokens = [token for token in tokens if token.strip()]
+    tokens = [token.upper() if token=="i" else token for token in tokens]
+
     return [token for token in tokens if token.strip()]
+    
 
 class OutfileHandler(object):
     def __init__(self, filename):
@@ -153,19 +157,16 @@ class TweetHTMLParser(HTMLParser.HTMLParser):
 
     def handle_starttag(self, tag, attrs):
         pass
-        #print "Start Tag is:", tag
 
     def handle_endtag(self, tag):
         pass
-        #print "End Tag is:", tag
 
     def handle_data(self, data):
-        #print "Regular Data is:", data
+        #Sneakily removing @ and # symbols.
         self.data += " ".join([word[1:] if word.startswith(("@", "#")) else word for word in data.split()]) + " "
-        #print "String so far:", self.data
 
     def handle_entityref(self, name):
-        #print "entref is", name
+        #print "entref is", nam
         data = unichr(htmlentitydefs.name2codepoint[name])
         self.data += data + " "
 
@@ -204,15 +205,12 @@ def analyze_files(input_file, output_file):
     #Prepping the NLP tagger.
     tagger = nlp.NLPlib()
 
-    #TODO find out if I can use more.
     #Prepare the list of known abbreviations
     abbreviations = init_abbreviations()
 
     #TODO potentially remove my regex.
-    ###Prepare the URL regex
     #url_regex2 = re.compile(r'(https?:\/\/)?([\da-z\.-]+)\.([a-z\.]{2,6})([\/\w\.-]*)*\/?', re.IGNORECASE)
     #url_regex3 = re.compile(r'((([A-Za-z]{3,9}:(?:\/\/)?)(?:[\-;:&=\+\$,\w]+@)?[A-Za-z0-9\.\-]+|(?:www\.|[\-;:&=\+\$,\w]+@)[A-Za-z0-9\.\-]+)((?:\/[\+~%\/\.\w\-]*)?\??(?:[\-\+=&;%@\.\w]*)#?(?:[\.\!\/\\\w]*))?)', re.IGNORECASE)
-    #TODO regex sourced from https://gist.github.com/uogbuji/705383
 
 
     count = 0
