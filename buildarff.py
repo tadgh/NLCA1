@@ -18,7 +18,7 @@ class UserClass(object):
     def get_name(self):
         return self._name
 
-    def generate_arff_data(self):
+    def generate_arff_data(self, limit):
         """
         This is a score generator that yields one vector at a time. For each tweet in each file
         in self._files it will spit out a vector of length n+1, where n is the length of the feature
@@ -30,16 +30,33 @@ class UserClass(object):
                 print "opening new file"
                 tweet_lines = []
                 count = 0
-                for line in file:
-                    if line == "|\n":
-                        if len(tweet_lines) > 0:
-                            count += 1                            
-                            scores = self.analyze_tweet(tweet_lines)
-                            scores.append(self._name)
-                            yield scores
-                        tweet_lines = []
-                    else:
-                        tweet_lines.append(line)
+                if limit <= 0:
+                    for line in file:
+                        if line == "|\n":
+                            if len(tweet_lines) > 0:
+                                count += 1
+                                scores = self.analyze_tweet(tweet_lines)
+                                scores.append(self._name)
+                                yield scores
+                            tweet_lines = []
+                        else:
+                            tweet_lines.append(line)
+                else:
+                    i = 0
+                    line = "placeholder"
+                    while i < limit and line != "":
+                        line = file.readline()
+                        if line == "|\n":
+                            if len(tweet_lines) > 0:
+                                count += 1
+                                scores = self.analyze_tweet(tweet_lines)
+                                scores.append(self._name)
+                                i += 1
+                                yield scores
+                            tweet_lines = []
+                        else:
+                            tweet_lines.append(line)
+
 
     def __str__(self):
         return self._name + " -- " + str(self._files)
@@ -117,7 +134,7 @@ def build_count_feature_set():
     f2 = features.SecondPersonFeature()
     f3 = features.ThirdPersonFeature()
     f4 = features.CoordinatingConjunctionsFeature()
-    f5 = features.PastTenseFeat     ure()
+    f5 = features.PastTenseFeature()
     f6 = features.FutureTenseFeature()
     f7 = features.CommaFeature()
     f8 = features.ColonFeature()
@@ -145,12 +162,13 @@ def main():
     args = parser.parse_args()
     user_classes = extract_classes_from_list(args.class_names)
     build_count_feature_set()
+    limit = args.n
     out = OutfileHandler(args.output_file[0])
     out.write_file_prologue(feature_list, user_classes)
     for user_class in user_classes:
         print "Generating new Arff data!"
-        for score_vector in user_class.generate_arff_data():
-           out.write_vector(score_vector) 
+        for score_vector in user_class.generate_arff_data(limit):
+            out.write_vector(score_vector)
 
 
 if __name__=="__main__":

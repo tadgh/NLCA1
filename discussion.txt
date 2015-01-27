@@ -113,3 +113,36 @@ In this case, the higest value is  nytimes: .45103 CBC 485155 The Oneion :0.4585
 Least Distinct is toronto star at 0.24174
 
 3.4 Pop Versus News
+
+In this question we split the classes into pop and news, each of which have 6 underlying .twt files to analyze from.
+
+With full data (all 1000 tweets) we see correct classification percentage of 87.47%.
+
+Here we can see what is obviously to be expected. Using 12000 tweets to classify, we end up with an extremely good level
+of accuracy in the cross-validation. This is due to the fact that the pop and news group are very distinct when compared to each other. The
+cross-validation in the other sections are comparing classes that are less distinct, and thus, the accuracy is lower.
+Here we have the statistics for precision and recall for pop and news at full data.
+
+Pop:    Precision = 0.92040 Recall = 0.81925
+News:   Precision = 0.83837 Recall = 0.92974
+
+Moving onto the half-data section, where we take only 500 tweets from each file, we achieve 86.83% correct classifications.
+We notice that there is a slight drop in performance compared to the accuracy of the full data version. This is obvious, since the two classes
+are distinct. Thus, more data allows us to better cluster the different classes, increasing the level of linear separability of the two.
+
+Pop:    Precision = 0.92079 Recall = 0.80600
+News:   Precision = 0.82750 Recall = 0.93067
+
+
+
+3.5 Feature Analysis
+
+After having analyzed the features on all attributes, I have come to a few small conclusions:
+Firstly, average sentence length never drops below fifth rank in usefulness. Proper and common nouns are also consistently
+useful in classification. I imagine this to be because every individual has a sentence length they tend to enjoy. Personally,
+I know I trail on and on with many commas. In terms of commonalities that sit at the bottom of the list are Future Tense,
+and wh-words. If I had to choose a single overriding feature that proves to be most overall useful given the current
+ arff files, I would choose Average Sentence Length.  One obvious comparison to make in terms of differences, is that the only
+time that First Person breaks into the top five is in the Pop Versus News arff. The reason for this is obvious; News
+organizations never refer to themselves by "I" or any other such pronoun. Thus the presence of such a personal pronoun
+is a strong indicator that the tweet is pop-related. There are also other such features
