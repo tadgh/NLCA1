@@ -153,4 +153,5 @@ Here are the things I have done to improve the tokenizer and arffbuilder.
 - Seriously added to modern slang. Many additions
 - Fixed errors in tagging. Here are the ones I fixed:
 	- i is incorrectly tagged as NN when it should be PRP. 
-
+	- greatly added to the modern slang set. 
+	-
