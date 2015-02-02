@@ -25,6 +25,15 @@ class UserClass(object):
         list, and the +1 is the class name itself. 
 
         """
+
+        #for infile in self._files:
+        ###    with open(infile, "r") as file:
+        #        tweet_lines = []
+        #        count = 0
+        #        if limit <= 0:
+        #            for line in file:
+
+
         for infile in self._files:
             with open(infile, "r") as file:
                 print "opening new file"
@@ -56,6 +65,7 @@ class UserClass(object):
                             tweet_lines = []
                         else:
                             tweet_lines.append(line)
+            print("for file {} counted {} tweets".format(infile, count))
 
 
     def __str__(self):
@@ -68,7 +78,7 @@ class UserClass(object):
         feature_scores = []
         for feature in feature_list:
             feature_scores.append(feature.get_score(tweet_lines))
-        print feature_scores
+        #print feature_scores
         return feature_scores
 
 class OutfileHandler(object):

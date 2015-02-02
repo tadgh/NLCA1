@@ -314,7 +314,11 @@ class AverageTokenLengthFeature(Feature):
             non_punc_tokens = [token.split("/")[0] for token in split_line if token.split("/")[0] not in self._punctuation_set]
             token_count += len(non_punc_tokens)
             total_token_length += sum([len(token.split("/")[0]) for token in non_punc_tokens])
-        avg_token_length = float(total_token_length) / token_count
+        try:
+            avg_token_length = float(total_token_length) / token_count
+        except ZeroDivisionError as e:
+            avg_token_length = 0
+            print("FOUND ZERO LENGTH TWEET: {} ".format(tweet))
 
         return "{0:.3f}".format(avg_token_length)
 

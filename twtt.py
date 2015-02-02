@@ -140,13 +140,18 @@ class OutfileHandler(object):
         self.outfile = open(filename, "w")
 
     def write_tweet(self, tweet):
+        if tweet:
+            for line in tweet:
+                #Since the line is in fact a list of all the tokens, we must join it beore writing.
+                if line == "":
+                    print "FOUND BLANK LINE!", line
+                self.outfile.write(" ".join(line) + "\n")
+        else:
+            #catching empty tweet possibility
+            self.outfile.write("\n")
         self.outfile.write("|\n")
-        for line in tweet:
-            #Since the line is in fact a list of all the tokens, we must join it beore writing.
-            self.outfile.write(" ".join(line) + "\n")
 
     def close(self):
-        self.outfile.write("|\n")
         self.outfile.close()
 
 
