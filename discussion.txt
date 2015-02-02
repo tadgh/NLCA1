@@ -99,18 +99,18 @@ According to my results, it is in fact more difficult to distinguish different n
 Here we compute the precision and recall for each individual class to determine which is the most identifiable.
 CBCNews: 		    Precision = 0.33148 Recall = 0.63883
 cnn: 			    Precision = 0.35918 Recall = 0.26479
-torontostarnews: 	Precision = 0.27549 Recall = 0.20800
+torontostarnews:	    Precision = 0.27549 Recall = 0.20800
 TheOnion: 		    Precision = 0.48858 Recall = 0.42842
 Reuters: 		    Precision = 0.35069 Recall = 0.20260
 nytimes: 		    Precision = 0.43661 Recall = 0.46546
 
 Now we have to determine which of the news organizations is the most "distinct" from the others. In order to do this, I believe
 that a good measure of distinctness is this: It's own tweets are mostly classified correctly, with few other tweets being mistaken for it.
-Thus we must use some combination of recall and precision. F
-
+Thus we must use some combination of recall and precision. 
 For now, I will take an average of precision and recall and select the class producing the highest value.
-In this case, the higest value is  nytimes: .45103 CBC 485155 The Oneion :0.4585
-Least Distinct is toronto star at 0.24174
+In this case, the higest values are  nytimes: .45103 CBCNews: .48515 The Oneion :0.4585. However, given these extremely similar values that we get by taking an average, we can look at the individual values to make a decision. CBC has extremely high recall, and low precision, whereas both TheOnion and the nytimes have very similar precision and recall scores. For this reason I would have to then say that the CBCNews account is the most distinct. 
+Least Distinct is toronto star at 0.24174, which apparently means that it is quite difficult to classify their own tweets correctly, 
+and other news organizations often get mistaken for them. 
 
 3.4 Pop Versus News
 
@@ -153,4 +153,5 @@ Here are the things I have done to improve the tokenizer and arffbuilder.
 - Seriously added to modern slang. Many additions
 - Fixed errors in tagging. Here are the ones I fixed:
 	- i is incorrectly tagged as NN when it should be PRP. 
-
+	- greatly added to the modern slang set. 
+	-
