@@ -79,7 +79,8 @@ def split_into_sentences(tweet, abbreviations):
     #First we save our abbreviations so we don't wipe them out. This replacement token is arbitrary, but it makes sure
     #I don't have to try to rebuild strings after accidentally oversplitting on periods.
     for abbr in abbreviations:
-        tweet = re.sub(" " + re.escape(abbr), " " +abbr.upper().rstrip(".") + "~|~|", tweet, flags=re.IGNORECASE)
+        fixed_abbr = re.sub(r"\.", "~|~|", abbr)
+        tweet = re.sub(r"\b" + re.escape(abbr), " " + fixed_abbr, tweet, flags=re.IGNORECASE)
 
     #potential_sentences = re.split(r"(\.\.+\s?)(?=[A-Z])|([?!]+)|(\.\s)|(\.$)", tweet)
     potential_sentences = sentence_split_regex.split(tweet)
@@ -98,10 +99,6 @@ def split_into_sentences(tweet, abbreviations):
         repunctuated_sentences.append(potential_sentences[-1])
 
     #Re-adding abbreviation periods.
-    i = 0
-    while i < len(repunctuated_sentences):
-        repunctuated_sentences[i] = re.sub(r'~\|~\|', ".", repunctuated_sentences[i], flags=re.IGNORECASE)
-        i += 1
 
     return [s for s in repunctuated_sentences if s]
 
@@ -117,6 +114,7 @@ def split_all_sentences_into_tokens(sentences):
     all_tokens = []
     for sentence in sentences:
         tokens = split_into_tokens(sentence)
+        tokens = fix_abbreviations_in_token_list(tokens)
         all_tokens.append(tokens)
     #print "all found tokens: ", all_tokens
     return all_tokens
@@ -128,7 +126,14 @@ def split_into_tokens(sentence):
     tokens = [token.upper() if token=="i" else token for token in tokens]
 
     return [token for token in tokens if token.strip()]
-    
+
+def fix_abbreviations_in_token_list(sentence):
+    i = 0
+    while i < len(sentence):
+        sentence[i] = re.sub(r'~\|~\|', ".", sentence[i], flags=re.IGNORECASE)
+        i += 1
+    return sentence
+
 
 class OutfileHandler(object):
     def __init__(self, filename):
@@ -184,8 +189,10 @@ def init_abbreviations():
     eng_abbrs = []
     with open("abbrev.english", "r") as abbr1:
         with open("pn_abbrev.english", "r") as abbr2:
-
-            eng_abbrs = [line.lower().strip() for line in abbr1.readlines()] + [line.lower().strip() for line in abbr2.readlines()]
+            with open("abbrev.extra", "r") as abbr3:
+                eng_abbrs = [line.lower().strip() for line in abbr1.readlines()]\
+                            +[line.lower().strip() for line in abbr2.readlines()]\
+                            +[line.lower().strip() for line in abbr3.readlines()]
     return eng_abbrs
 
 
