@@ -51,6 +51,7 @@ class UserClass(object):
                         else:
                             tweet_lines.append(line)
                 else:
+                    #We have a hard limit on the amount of lines per file.
                     i = 0
                     line = "placeholder"
                     while i < limit and line != "":

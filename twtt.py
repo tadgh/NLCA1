@@ -1,7 +1,4 @@
-import string
-from constants import sentence_split_regex, url_regex, secondary_url_regex, token_split_regex
-
-__author__ = 'tadgh'
+from constants import sentence_split_regex, url_regex, secondary_url_regex, token_split_regex, punctuation_collapsing_regexes
 import HTMLParser
 import argparse
 import re
@@ -74,6 +71,7 @@ def remove_urls(tweet):
     tweet = re.sub(secondary_url_regex, "", tweet)
     return tweet
 
+
 def split_into_sentences(tweet, abbreviations):
 
     #First we save our abbreviations so we don't wipe them out. This replacement token is arbitrary, but it makes sure
@@ -82,7 +80,10 @@ def split_into_sentences(tweet, abbreviations):
         fixed_abbr = re.sub(r"\.", "~|~|", abbr)
         tweet = re.sub(r"\b" + re.escape(abbr), " " + fixed_abbr, tweet, flags=re.IGNORECASE)
 
-    #potential_sentences = re.split(r"(\.\.+\s?)(?=[A-Z])|([?!]+)|(\.\s)|(\.$)", tweet)
+    #Collapses ! and ? to a single one for tagging purposes.
+    for (replacement, regex) in punctuation_collapsing_regexes:
+        tweet = regex.sub(replacement, tweet)
+
     potential_sentences = sentence_split_regex.split(tweet)
     #cleaning out unmatched groups
     potential_sentences = [sentence.strip() for sentence in potential_sentences if sentence]
@@ -97,7 +98,6 @@ def split_into_sentences(tweet, abbreviations):
     #Grabbing the final sentence if it wasn't terminated by punctuation.
     if i < len(potential_sentences):
         repunctuated_sentences.append(potential_sentences[-1])
-
     #Re-adding abbreviation periods.
 
     return [s for s in repunctuated_sentences if s]
@@ -116,7 +116,6 @@ def split_all_sentences_into_tokens(sentences):
         tokens = split_into_tokens(sentence)
         tokens = fix_abbreviations_in_token_list(tokens)
         all_tokens.append(tokens)
-    #print "all found tokens: ", all_tokens
     return all_tokens
 
 
@@ -176,7 +175,6 @@ class TweetHTMLParser(HTMLParser.HTMLParser):
         self.data += " ".join([word[1:] if word.startswith(("@", "#")) else word for word in data.split()]) + " "
 
     def handle_entityref(self, name):
-        #print "entref is", nam
         data = unichr(htmlentitydefs.name2codepoint[name])
         self.data += data + " "
 
@@ -229,7 +227,6 @@ def analyze_files(input_file, output_file):
     for tweet in in_file:
         count += 1
         tweet_sentences_processed = preprocess_tweet(tweet, parser, abbreviations, tagger)
-        #print count, " --- ", tweet_sentences_processed
         out_file.write_tweet(tweet_sentences_processed)
     print count, " --- ", in_file
     out_file.close()

@@ -6,36 +6,17 @@ java -cp weka.jar weka.classifiers.bayes.NaiveBayes -t celebpotpour.arff -o
 java -cp weka.jar weka.classifiers.trees.J48 -t celebpotpour.arff -o
 
 
-=== Stratified cross-validation ===
-
-Correctly Classified Instances        3064               51.2203 %
-Incorrectly Classified Instances      2918               48.7797 %
-Kappa statistic                          0.4147
-Mean absolute error                      0.2453
-Root mean squared error                  0.3451
-Relative absolute error                 88.292  %
-Root relative squared error             92.6131 %
-Total Number of Instances             5982
-
-
-=== Confusion Matrix ===
-
-   a   b   c   d   e   f   <-- classified as
- 516 134 114  38 152  46 |   a = BarackObama
-  80 522 128  97 114  59 |   b = StephenAtHome
- 102  97 549 120  65  53 |   c = aplusk
-  36 114 281 469  74  26 |   d = KimKardashian
- 178 159  75  62 447  78 |   e = neiltyson
-  67  99 148  37  85 561 |   f = shakira
-
-The above is SMO data.
+Found in 3.1output.txt is the SMO data.
 
 Seeing as by default, feeding it only a single arff file will cause it to do 10-fold cross-validation, we do not have to add any other parameters to these commands. 
 
-To begin with, SMO, support vector machines, had accuracy of 51.22% during cross-validation. This roughly matched what it had for accuracy in the training data. 
-Next up, naive bayes. In this case, we achieved 43.33% accuracy during cross-validation. This is worse than the SMO so far. 
-Finally, we look at trees.J48, which achieved 43.81%, which is extremely similar to the result we achieve with naive bayes. 
-However, it seems to be the support vector machines that allow us to achieve the best possible result. 
+To begin with, SMO, support vector machines, had accuracy of 50.52% during cross-validation. This roughly matched what it had for accuracy in the training data, though it is slightly
+lower, as is logical given the fact that we are then testing on our training data.
+Next up, naive bayes. In this case, we achieved 43.9% accuracy during cross-validation. This is worse than the SMO so far.
+Finally, we look at trees.J48, which achieved 45.3%, which is extremely similar to the result we achieve with naive bayes.
+However, it seems to be the support vector machines that allow us to achieve the best possible result. One interesting thing to note,
+is that when I started including blank tweets (tweets which were empty after processing), SVM and bayes went down in accuracy, whereas J48 went up in accuracy.
+
 
 3.2 Pop Stars.
 
@@ -43,96 +24,92 @@ Using the SVM method which previously generated the best data, we now have this 
 
 >>>java -cp weka.jar weka.classifiers.functions.SMO -t pop.arff -o
 
-
-Correctly Classified Instances        2471               41.5853 %
-Incorrectly Classified Instances      3471               58.4147 %
-
-
-=== Confusion Matrix ===
-
-   a   b   c   d   e   f   <-- classified as
- 712  77  12  29  61 109 |   a = britneyspears
- 121 359  58  41 250 162 |   b = justinbieber
-  75 185 187  97 270 185 |   c = katyperry
- 123 123  81 198 186 246 |   d = ladygaga
-  48 181  92  72 511  96 |   e = rihanna
- 123 131  34 100 103 504 |   f = taylorswift13
-
-
-Compared to our results in the previous section, it appears as though the classifier is having more trouble distinguishing between these different tweeters. This is logical, as since they are all from the same superclass "pop stars", it makes sense that their writing styles are similar given the features we are extracting. When I decided to use the same training file to be the testing file, here are the results from WEKA.
-
+We can observe the results when using 10x cross-fold validation (see 3.2output_10xval.txt)
+Compared to our results in the previous section, it appears as though the classifier is having more trouble distinguishing between these different tweeters.
+This is logical, as since they are all from the same superclass "pop stars", it makes sense that their writing styles are similar given the features we are extracting.
+When I decided to use the same training file to be the testing file, here are the results from WEKA (check 3.2output.txt).
 
 >>>java -cp weka.jar weka.classifiers.functions.SMO -t pop.arff -T pop.arff -o
 
-Correctly Classified Instances        2559               43.0663 %
-Incorrectly Classified Instances      3383               56.9337 %
-
-=== Confusion Matrix ===
-
-   a   b   c   d   e   f   <-- classified as
- 714  77  14  30  57 108 |   a = britneyspears
- 122 380  57  38 236 158 |   b = justinbieber
-  75 175 192  99 268 190 |   c = katyperry
- 124 124  74 215 177 243 |   d = ladygaga
-  48 178  83  67 530  94 |   e = rihanna
- 123 119  33  89 103 528 |   f = taylorswift13
-
-Using the same file for testing against, we achieve better performance. I suppose this makes sense as we are using literally the exact same data that we built our model with, it makes sense that it would perform mildly better, since we can include parts of the training data. 
+Using the same file for testing against, we achieve better performance, though only very marginally so.
+I suppose this makes sense as we are using literally the exact same data that we built our model with,
+it makes sense that it would perform mildly better, since we can include parts of the training data. Maybe a direction for
+future work would be to look into better ways to attempt to sub-group various pop singers and thus extracting more relevant
+features.
 
 3.3 News
 
-Correctly Classified Instances        2225               37.1328 %
-Incorrectly Classified Instances      3767               62.8672 %
+Correctly Classified Instances        2225               37.0833 %
+Incorrectly Classified Instances      3775               62.9167 %
 
 === Confusion Matrix ===
 
-   a   b   c   d   e   f   <-- classified as
- 658  62 110  38  51  81 |   a = CBCNews
- 263 264 157 103 105 105 |   b = cnn
- 430  97 208  85  67 113 |   c = torontostarnews
- 126 123  72 428  74 176 |   d = TheOnion
- 318 105 150  97 202 125 |   e = Reuters
- 190  84  58 125  77 465 |   f = nytimes
+               a   b   c   d   e   f   <-- classified as
+             650  36 118  36  69  91 |   a = CBCNews
+             292 159 160 135 152 102 |   b = cnn
+             432  38 251  64  84 131 |   c = torontostarnews
+             115 115  65 430  84 191 |   d = TheOnion
+             334  76 145  99 220 126 |   e = Reuters
+             183  40  46 128  88 515 |   f = nytimes
+ TOTALS:    2006 464 785 892 697 1156
 
-According to my results, it is in fact more difficult to distinguish different news agencies from one another compared to pop stars. This indicates to me that pop stars are a more distinguishable and unique group. 
+
+According to my results, it is in fact more difficult to distinguish different news agencies from one another compared to pop stars.
+This indicates to me that pop stars are a more distinguishable and unique group when compared to newscasters as a whole.
 
 Here we compute the precision and recall for each individual class to determine which is the most identifiable.
-CBCNews: 		    Precision = 0.33148 Recall = 0.63883
-cnn: 			    Precision = 0.35918 Recall = 0.26479
-torontostarnews:	    Precision = 0.27549 Recall = 0.20800
-TheOnion: 		    Precision = 0.48858 Recall = 0.42842
-Reuters: 		    Precision = 0.35069 Recall = 0.20260
-nytimes: 		    Precision = 0.43661 Recall = 0.46546
+CBCNews: 		    Precision = 0.32403 Recall = 0.650
+cnn: 			    Precision = 0.34267 Recall = 0.159
+torontostarnews:	Precision = 0.31975 Recall = 0.251
+TheOnion: 		    Precision = 0.48206 Recall = 0.430
+Reuters: 		    Precision = 0.31564 Recall = 0.220
+nytimes: 		    Precision = 0.44550 Recall = 0.515
 
 Now we have to determine which of the news organizations is the most "distinct" from the others. In order to do this, I believe
 that a good measure of distinctness is this: It's own tweets are mostly classified correctly, with few other tweets being mistaken for it.
 Thus we must use some combination of recall and precision. 
 For now, I will take an average of precision and recall and select the class producing the highest value.
-In this case, the higest values are  nytimes: .45103 CBCNews: .48515 The Oneion :0.4585. However, given these extremely similar values that we get by taking an average, we can look at the individual values to make a decision. CBC has extremely high recall, and low precision, whereas both TheOnion and the nytimes have very similar precision and recall scores. For this reason I would have to then say that the CBCNews account is the most distinct. 
-Least Distinct is toronto star at 0.24174, which apparently means that it is quite difficult to classify their own tweets correctly, 
-and other news organizations often get mistaken for them. 
+In this case, the higest values are
+
+nytimes:    0.48025
+CBCNews:    0.48702
+The Onion:  0.45603
+
+However, given these extremely similar values that we get by taking an average, we can look at the individual values to make a decision.
+CBC has extremely high recall, and low precision, whereas both TheOnion and the nytimes have very similar precision and recall scores.
+For this reason I would have to then say that the CBCNews account is the most distinct.
+Least Distinct is cnn at 0.25083, which apparently means that it is quite difficult to classify their own tweets correctly,
+and other news organizations often get mistaken for them. Even looking at totals for the columns, cnn has 785 tweets classified as them,
+with only 251 of them actually being cnn tweets.
 
 3.4 Pop Versus News
 
 In this question we split the classes into pop and news, each of which have 6 underlying .twt files to analyze from.
 
-With full data (all 1000 tweets) we see correct classification percentage of 87.47%.
+With full data (all 1000 tweets) we see correct classification percentage of 86.125%. When I remove tweets that are empty, it rises to 87.34%.
 
 Here we can see what is obviously to be expected. Using 12000 tweets to classify, we end up with an extremely good level
 of accuracy in the cross-validation. This is due to the fact that the pop and news group are very distinct when compared to each other. The
 cross-validation in the other sections are comparing classes that are less distinct, and thus, the accuracy is lower.
 Here we have the statistics for precision and recall for pop and news at full data.
 
-Pop:    Precision = 0.92040 Recall = 0.81925
-News:   Precision = 0.83837 Recall = 0.92974
+Pop:    Precision = 0.90997 Recall = 0.80183
+News:   Precision = 0.82288 Recall = 0.92067
 
 Moving onto the half-data section, where we take only 500 tweets from each file, we achieve 86.83% correct classifications.
 We notice that there is a slight drop in performance compared to the accuracy of the full data version. This is obvious, since the two classes
-are distinct. Thus, more data allows us to better cluster the different classes, increasing the level of linear separability of the two.
+are distinct. Thus, more data allows us to better cluster the different classes, increasing the level of linear separability of the two. However,
+it is surprising that cutting out half the data only marginally affected the performance. This is a strong indicator that the two classes
+have a very high degree of linear separability that is only further enforced by the inclusion of more data. In tmers of the
+fairness of the comparison, I believe it is absolutely fair. This is the point of a classifier, to distinguish two or more possible
+classes. The classifier doesn't care what goes into your classes. This classifier is just as if not more useful than the previous ones,
+as it provides us with a high degree of accuracy. I suppose when one references "unfairness" it is a measure of how obviously distinct
+the classes are and the ease with which they are apparently classified. I personally feel that there is no unfairness. You could
+compare tweets in english and german, and even if the accuracy is 100%, the classifier and the comparison are still fair and valid.
+Here we see the values for the half-data 10X cross-fold validation:
 
-Pop:    Precision = 0.92079 Recall = 0.80600
-News:   Precision = 0.82750 Recall = 0.93067
-
+Pop:    Precision = 0.90993 Recall = 0.79133
+News:   Precision = 0.81539 Recall = 0.92167
 
 
 3.5 Feature Analysis
@@ -142,16 +119,22 @@ Firstly, average sentence length never drops below fifth rank in usefulness. Pro
 useful in classification. I imagine this to be because every individual has a sentence length they tend to enjoy. Personally,
 I know I trail on and on with many commas. In terms of commonalities that sit at the bottom of the list are Future Tense,
 and wh-words. If I had to choose a single overriding feature that proves to be most overall useful given the current
- arff files, I would choose Average Sentence Length.  One obvious comparison to make in terms of differences, is that the only
+arff files, I would choose Average Sentence Length.  One obvious comparison to make in terms of differences, is that the only
 time that First Person breaks into the top five is in the Pop Versus News arff. The reason for this is obvious; News
 organizations never refer to themselves by "I" or any other such pronoun. Thus the presence of such a personal pronoun
-is a strong indicator that the tweet is pop-related. There are also other such features
+is a strong indicator that the tweet is pop-related. There are also other such features. Speaking of the news ARFF specifically,
+the usage of proper nouns is the strongest indicator, at 0.11351. Looking at the bottom of the list are modern slang and future tense.
+This makes perfect sense, seeing as essentially no news agency would use modern slang in its tweets, and also, news agencies tend
+to report on what is currently happening, or what just happened. Rarely would they tweet about the future. I feel as though
+these numbers all reflect reality.
 
 
 3.6 Bonus: 
 Here are the things I have done to improve the tokenizer and arffbuilder.
 - Seriously added to modern slang. Many additions
 - Fixed errors in tagging. Here are the ones I fixed:
-	- i is incorrectly tagged as NN when it should be PRP. 
-	- greatly added to the modern slang set. 
-	-
+	- i is incorrectly tagged as NN when it should be PRP.
+	- I have elected to collapse repeated punctuation, as !!! is currently tagged as NN instead of .
+
+
+

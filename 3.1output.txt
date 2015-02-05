@@ -1,0 +1,50 @@
+
+Time taken to build model: 0.57 seconds
+Time taken to test model on training data: 0.04 seconds
+
+=== Error on training data ===
+
+Correctly Classified Instances        3094               51.5667 %
+Incorrectly Classified Instances      2906               48.4333 %
+Kappa statistic                          0.4188
+Mean absolute error                      0.2445
+Root mean squared error                  0.3441
+Relative absolute error                 88.0347 %
+Root relative squared error             92.3421 %
+Total Number of Instances             6000     
+
+
+=== Confusion Matrix ===
+
+   a   b   c   d   e   f   <-- classified as
+ 524 130 114  48 135  49 |   a = BarackObama
+  90 534 127  96 106  47 |   b = StephenAtHome
+ 132  94 559 104  44  67 |   c = aplusk
+  38 108 289 470  66  29 |   d = KimKardashian
+ 220 173  59  44 418  86 |   e = neiltyson
+  68  78 144  55  66 589 |   f = shakira
+
+
+
+=== Stratified cross-validation ===
+
+Correctly Classified Instances        3031               50.5167 %
+Incorrectly Classified Instances      2969               49.4833 %
+Kappa statistic                          0.4062
+Mean absolute error                      0.2452
+Root mean squared error                  0.3451
+Relative absolute error                 88.2773 %
+Root relative squared error             92.6025 %
+Total Number of Instances             6000     
+
+
+=== Confusion Matrix ===
+
+   a   b   c   d   e   f   <-- classified as
+ 515 127 120  50 138  50 |   a = BarackObama
+  93 514 132  97 118  46 |   b = StephenAtHome
+ 138  93 548 113  44  64 |   c = aplusk
+  37 116 291 459  64  33 |   d = KimKardashian
+ 222 170  62  46 414  86 |   e = neiltyson
+  70  82 143  53  71 581 |   f = shakira
+
