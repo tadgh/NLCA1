@@ -134,7 +134,44 @@ Here are the things I have done to improve the tokenizer and arffbuilder.
 - Seriously added to modern slang. Many additions
 - Fixed errors in tagging. Here are the ones I fixed:
 	- i is incorrectly tagged as NN when it should be PRP.
-	- I have elected to collapse repeated punctuation, as !!! is currently tagged as NN instead of .
+	- I have elected to collapse repeated punctuation, as !!! is currently tagged as 'NN' instead of '.'
+
+I would also like to do the second bonus section, wherein we discuss the possibility of using only five different data
+points from both pop stars and news agencies. In this case, what I believe will happen is that we will either slightly
+increase or slightly decrease accuracy, depending on which data set is withheld. My reasoning for this is that given
+our extremely small data size, it is possible that a large portion of tweets have very little of value to add. Thus,
+omitting 20% of the data at this size could cause a reasonable swing in accuracy. We will now test a few scenarios:
+
+1. Omit The Onion and omit Rihanna.
+2. Omit The Onion and omit Justin Bieber.
+3. Omit CNN and Rihanna
+4. Omit CNN and Justin Bieber.
+
+This may give us some insight as to which tweeter is more influential within their individual class.
+
+1.
+Correctly Classified Instances        8781               87.81   %
+Incorrectly Classified Instances      1219               12.19   %
+
+2.
+Correctly Classified Instances        8693               86.93   %
+Incorrectly Classified Instances      1307               13.07   %
+
+3.
+Correctly Classified Instances        8726               87.26   %
+Incorrectly Classified Instances      1274               12.74   %
+
+4.
+Correctly Classified Instances        8667               86.67   %
+Incorrectly Classified Instances      1333               13.33   %
 
 
-
+As predicted, there were marginal shifts in both directions, but nothing extremely large. First we will discuss the effect
+of adding or removing a particular user. Take example 1, where we removed Rihanna and TheOnion. When we did this, classification
+rates rose just over 1% compared to using all of the data. When we compare this to example 2 where we get a much smaller increase,
+this is indicative to me that justin bieber's tweets are more useful in classification than rihanna's are. Same goes for
+CNN and the onion. When removing cnn, we get slightly worse results than when we remove the onion, indicating that cnn has
+a larger impact on classification than the onion does.
+On a larger level, the fact that we can remove 20% of the data without experiencing extremely large shifts in accuracy
+is a good indication that the groups themselves are in fact quite distinct, and the removal of a single tweeter does not
+adversely effect classification too much.
